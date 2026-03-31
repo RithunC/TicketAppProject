@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="TestProject/TestProject.csproj" Id="e096755e-5d2d-4aea-b296-91327069dc2f" />
+  <Project Path="TicketWebApp/TicketWebApp.csproj" />
+</Solution>

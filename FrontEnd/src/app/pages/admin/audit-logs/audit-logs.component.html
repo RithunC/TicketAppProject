@@ -1,0 +1,187 @@
+<app-navbar />
+<div class="page">
+
+  <!-- Header -->
+  <div class="ph">
+    <div>
+      <h1 class="pt">Audit Logs</h1>
+      <p class="ps">{{ result()?.totalCount ?? 0 }} total entries — system activity trail</p>
+    </div>
+    <button class="btn-refresh" (click)="refresh()">
+      <i class="bi bi-arrow-clockwise"></i> Refresh
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-card">
+    <div class="filter-row">
+
+      <!-- From Date -->
+      <div class="fg">
+        <label>From</label>
+        <input type="datetime-local" [(ngModel)]="filters.fromUtc" class="finp" />
+      </div>
+
+      <!-- To Date -->
+      <div class="fg">
+        <label>To</label>
+        <input type="datetime-local" [(ngModel)]="filters.toUtc" class="finp" />
+      </div>
+
+      <!-- User -->
+      <div class="fg">
+        <label>User</label>
+        <input type="text" [(ngModel)]="filters.actorUserName"
+          (keyup.enter)="applyFilter()"
+          placeholder="Search by username…" class="finp" />
+      </div>
+
+      <!-- Role -->
+      <div class="fg">
+        <label>Role</label>
+        <select [(ngModel)]="filters.role" class="finp">
+          @for (r of roleOptions; track r.value) {
+            <option [value]="r.value">{{ r.label }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Action -->
+      <div class="fg">
+        <label>Action</label>
+        <select [(ngModel)]="filters.action" class="finp">
+          @for (a of actionOptions; track a.value) {
+            <option [value]="a.value">{{ a.label }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Status -->
+      <div class="fg">
+        <label>Status</label>
+        <select [(ngModel)]="filters.status" class="finp">
+          <option value="">All</option>
+          <option value="success">Success</option>
+          <option value="failed">Failed</option>
+        </select>
+      </div>
+
+      <!-- Buttons -->
+      <div class="fg fg-btns">
+        <button class="btn-apply" (click)="applyFilter()">
+          <i class="bi bi-funnel"></i> Apply
+        </button>
+        <button class="btn-clear" (click)="clearFilters()">
+          <i class="bi bi-x"></i> Clear
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="tcard">
+    @if (loading()) {
+      <div class="loading-state"><div class="loading-ring"></div></div>
+    } @else if (filteredItems.length) {
+      <div class="twrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>User</th>
+              <th>Role</th>
+              <th>Action</th>
+              <th>Description</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (log of filteredItems; track log.id) {
+              <tr [class.row-fail]="!log.success">
+
+                <!-- Time -->
+                <td class="tcell-time">
+                  {{ log.occurredAtUtc | date:'MMM d, y' }}<br>
+                  <span class="time-sub">{{ log.occurredAtUtc | date:'HH:mm:ss' }}</span>
+                </td>
+
+                <!-- User -->
+                <td>
+                  @if (log.actorUserName) {
+                    <div class="user-cell">
+                      <div class="uc-av">{{ log.actorUserName[0].toUpperCase() }}</div>
+                      <span>{{ log.actorUserName }}</span>
+                    </div>
+                  } @else {
+                    <span class="anon">System</span>
+                  }
+                </td>
+
+                <!-- Role -->
+                <td>
+                  @if (log.actorRole) {
+                    <span class="role-tag role-{{ log.actorRole.toLowerCase() }}">{{ log.actorRole }}</span>
+                  } @else { — }
+                </td>
+
+                <!-- Action -->
+                <td>
+                  <span class="act-badge {{ actionClass(log.action) }}">{{ actionLabel(log.action) }}</span>
+                </td>
+
+                <!-- Description -->
+                <td class="tcell-desc">
+                  <span class="desc-text" [title]="getDescription(log)">
+                    {{ getDescription(log) }}
+                  </span>
+                </td>
+
+                <!-- Status -->
+                <td>
+                  <span class="sc-badge {{ statusClass(log.statusCode) }}">
+                    {{ log.success ? 'Success' : 'Failed' }} ({{ log.statusCode }})
+                  </span>
+                </td>
+
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pgbar">
+        <span class="pgi">
+          Showing {{ ((page()-1)*pageSize)+1 }}–{{ min(page()*pageSize, result()!.totalCount) }}
+          of {{ result()!.totalCount }}
+        </span>
+        <div class="pgbtns">
+          <button class="pgb" [disabled]="page()===1" (click)="prevPage()">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          @for (p of pageNumbers(); track p) {
+            @if (p === -1) { <span class="pg-ellipsis">…</span> }
+            @else {
+              <button class="pgb pgb-num" [class.pgb-active]="page()===p" (click)="goToPage(p)">
+                {{ p }}
+              </button>
+            }
+          }
+          <button class="pgb" [disabled]="isLastPage()" (click)="nextPage()">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+    } @else {
+      <div class="empty">
+        <i class="bi bi-journal-check"></i>
+        <p>No audit log entries found</p>
+        @if (filters.action || filters.actorUserName || filters.role || filters.fromUtc || filters.status) {
+          <button class="btn-clear-em" (click)="clearFilters()">Clear filters</button>
+        }
+      </div>
+    }
+  </div>
+</div>

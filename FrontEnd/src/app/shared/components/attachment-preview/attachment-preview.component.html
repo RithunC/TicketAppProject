@@ -1,0 +1,51 @@
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="modal-box">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="modal-title">
+        <i class="bi bi-file-earmark"></i>
+        <span>{{ attachment?.fileName }}</span>
+      </div>
+      <button class="close-btn" (click)="close.emit()" title="Close">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+
+      @if (state() === 'loading') {
+        <div class="preview-center">
+          <div class="loading-ring"></div>
+          <p class="preview-hint">Loading preview…</p>
+        </div>
+      }
+
+      @if (state() === 'image' && dataUrl()) {
+        <div class="img-wrap">
+          <img [src]="dataUrl()!" [alt]="attachment?.fileName" class="preview-img" />
+        </div>
+      }
+
+      @if (state() === 'pdf' && dataUrl()) {
+        <iframe [src]="dataUrl()!" class="preview-pdf" title="PDF Preview"></iframe>
+      }
+
+      @if (state() === 'text' && textBody() !== null) {
+        <pre class="preview-text">{{ textBody() }}</pre>
+      }
+
+      @if (state() === 'unsupported') {
+        <div class="preview-center">
+          <i class="bi bi-file-earmark-x unsup-icon"></i>
+          <p class="preview-hint">
+            {{ errorMsg() ?? 'Preview not available for this file type.' }}
+          </p>
+          <p class="unsup-sub">Download the file to view it.</p>
+        </div>
+      }
+
+    </div>
+  </div>
+</div>

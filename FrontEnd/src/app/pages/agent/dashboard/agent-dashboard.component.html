@@ -1,0 +1,64 @@
+<app-navbar />
+<div class="page">
+  <div class="ph">
+    <div>
+      <h1 class="pt">Welcome, {{ auth.currentUser()?.displayName }}</h1>
+      <p class="ps">Your support queue at a glance</p>
+    </div>
+    <a routerLink="/agent/tickets" class="btn-pri"><i class="bi bi-inbox"></i> My Queue</a>
+  </div>
+
+  @if (agentStats()) {
+    <div class="sgrid">
+      <a routerLink="/agent/tickets" class="sc sc-b sc-link">
+        <div class="si"><i class="bi bi-person-check"></i></div>
+        <div class="sb">
+          <span class="sv">{{ agentStats()!.assignedToMe }}</span>
+          <span class="sl">Assigned to Me</span>
+        </div>
+        <i class="bi bi-arrow-right sc-arr"></i>
+      </a>
+      <a routerLink="/agent/tickets" [queryParams]="{status:'open'}" class="sc sc-i sc-link">
+        <div class="si"><i class="bi bi-circle"></i></div>
+        <div class="sb">
+          <span class="sv">{{ agentStats()!.open }}</span>
+          <span class="sl">Open</span>
+        </div>
+        <i class="bi bi-arrow-right sc-arr"></i>
+      </a>
+      <a routerLink="/agent/tickets" [queryParams]="{status:'in-progress'}" class="sc sc-p sc-link">
+        <div class="si"><i class="bi bi-arrow-clockwise"></i></div>
+        <div class="sb">
+          <span class="sv">{{ agentStats()!.inProgress }}</span>
+          <span class="sl">In Progress</span>
+        </div>
+        <i class="bi bi-arrow-right sc-arr"></i>
+      </a>
+      <a routerLink="/agent/tickets" [queryParams]="{status:'resolved'}" class="sc sc-g sc-link">
+        <div class="si"><i class="bi bi-check-circle"></i></div>
+        <div class="sb">
+          <span class="sv">{{ agentStats()!.resolved }}</span>
+          <span class="sl">Resolved</span>
+        </div>
+        <i class="bi bi-arrow-right sc-arr"></i>
+      </a>
+      <a routerLink="/agent/tickets" class="sc sc-r sc-link">
+        <div class="si"><i class="bi bi-exclamation-triangle"></i></div>
+        <div class="sb">
+          <span class="sv">{{ agentStats()!.overdue }}</span>
+          <span class="sl">Overdue</span>
+        </div>
+        <i class="bi bi-arrow-right sc-arr"></i>
+      </a>
+    </div>
+
+    <h2 class="sth">Quick Actions</h2>
+    <a routerLink="/agent/tickets" class="qa">
+      <div class="qa-icon"><i class="bi bi-inbox"></i></div>
+      <div class="qa-text"><h3>My Queue</h3><p>View and manage your assigned tickets</p></div>
+      <i class="bi bi-arrow-right qa-arr"></i>
+    </a>
+  } @else {
+    <div class="loading-state"><div class="loading-ring"></div></div>
+  }
+</div>

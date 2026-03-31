@@ -1,0 +1,16 @@
+# Node (Frontend)
+node_modules/
+dist/
+.angular/
+
+# .NET (Backend)
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Environment
+.env

@@ -1,0 +1,65 @@
+<app-navbar />
+<div class="page">
+  <div class="ph">
+    <div><h1 class="pt">Admin Dashboard</h1><p class="ps">System-wide ticket overview</p></div>
+    <a routerLink="/admin/tickets" class="btn-sec"><i class="bi bi-ticket-detailed"></i> View All Tickets</a>
+  </div>
+
+  @if (summary()) {
+    <div class="stats-grid">
+      <a routerLink="/admin/tickets" class="sc sc-indigo sc-link">
+        <div class="si"><i class="bi bi-ticket-perforated"></i></div>
+        <div class="sb"><span class="sv">{{ summary()!.total }}</span><span class="sl">Total</span></div>
+        <i class="bi bi-arrow-right sc-arr"></i>
+      </a>
+      <a routerLink="/admin/tickets" [queryParams]="{status:'open'}" class="sc sc-blue sc-link">
+        <div class="si"><i class="bi bi-circle"></i></div>
+        <div class="sb"><span class="sv">{{ summary()!.open }}</span><span class="sl">Open</span></div>
+        <i class="bi bi-arrow-right sc-arr"></i>
+      </a>
+      <a routerLink="/admin/tickets" [queryParams]="{status:'in-progress'}" class="sc sc-purple sc-link">
+        <div class="si"><i class="bi bi-arrow-clockwise"></i></div>
+        <div class="sb"><span class="sv">{{ summary()!.inProgress }}</span><span class="sl">In Progress</span></div>
+        <i class="bi bi-arrow-right sc-arr"></i>
+      </a>
+      <a routerLink="/admin/tickets" [queryParams]="{status:'resolved'}" class="sc sc-green sc-link">
+        <div class="si"><i class="bi bi-check-circle"></i></div>
+        <div class="sb"><span class="sv">{{ summary()!.resolved }}</span><span class="sl">Resolved</span></div>
+        <i class="bi bi-arrow-right sc-arr"></i>
+      </a>
+      <a routerLink="/admin/tickets" [queryParams]="{status:'closed'}" class="sc sc-gray sc-link">
+        <div class="si"><i class="bi bi-x-circle"></i></div>
+        <div class="sb"><span class="sv">{{ summary()!.closed }}</span><span class="sl">Closed</span></div>
+        <i class="bi bi-arrow-right sc-arr"></i>
+      </a>
+      <a routerLink="/admin/tickets" [queryParams]="{status:'overdue'}" class="sc sc-red sc-link">
+        <div class="si"><i class="bi bi-exclamation-triangle"></i></div>
+        <div class="sb"><span class="sv">{{ summary()!.overdue }}</span><span class="sl">Overdue</span></div>
+        <i class="bi bi-arrow-right sc-arr"></i>
+      </a>
+    </div>
+
+    <div class="row2">
+      <div class="card">
+        <div class="ch"><h3>Priority Breakdown</h3></div>
+        <div class="cb">
+          <div class="pbars">
+            <div class="prow"><span class="pl"><span class="dot dot-u"></span>Urgent</span><div class="bt"><div class="bf bu" [style.width.%]="pct(summary()!.urgentPriority,summary()!.total)"></div></div><span class="pc">{{ summary()!.urgentPriority }}</span></div>
+            <div class="prow"><span class="pl"><span class="dot dot-h"></span>High</span><div class="bt"><div class="bf bh" [style.width.%]="pct(summary()!.highPriority,summary()!.total)"></div></div><span class="pc">{{ summary()!.highPriority }}</span></div>
+            <div class="prow"><span class="pl"><span class="dot dot-m"></span>Medium</span><div class="bt"><div class="bf bm" [style.width.%]="pct(summary()!.mediumPriority,summary()!.total)"></div></div><span class="pc">{{ summary()!.mediumPriority }}</span></div>
+            <div class="prow"><span class="pl"><span class="dot dot-l"></span>Low</span><div class="bt"><div class="bf bl" [style.width.%]="pct(summary()!.lowPriority,summary()!.total)"></div></div><span class="pc">{{ summary()!.lowPriority }}</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch"><h3>Quick Actions</h3></div>
+        <div class="cb">
+          <a routerLink="/admin/tickets" class="qa"><i class="bi bi-ticket-detailed"></i><div><strong>All Tickets</strong><span>View and manage tickets</span></div><i class="bi bi-chevron-right qa-arr"></i></a>
+          <a routerLink="/admin/users"   class="qa"><i class="bi bi-people"></i><div><strong>Users</strong><span>View all users</span></div><i class="bi bi-chevron-right qa-arr"></i></a>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="loading-state"><div class="loading-ring"></div></div>
+  }
+</div>
