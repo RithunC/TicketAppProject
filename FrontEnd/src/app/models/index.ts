@@ -41,7 +41,7 @@ export interface TicketQueryDto {
 }
 export interface TicketListItemDto {
   id: number; title: string; priority: string; priorityRank: number;
-  status: string; department?: string; category?: string;
+  status: string; isClosedState: boolean; department?: string; category?: string;
   createdBy: string; assignee?: string; createdAt: string; dueAt?: string;
 }
 export interface TicketResponseDto {

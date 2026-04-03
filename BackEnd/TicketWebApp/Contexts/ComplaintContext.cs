@@ -1,13 +1,13 @@
-﻿using TicketWebApp.Models;
+﻿using TicketWebApp.Models; 
 using Microsoft.EntityFrameworkCore;
 
 
 namespace TicketWebApp.Contexts
 {
-    public class ComplaintContext : DbContext
+    public class ComplaintContext : DbContext //inherit dbcontext
     {
         public ComplaintContext(DbContextOptions<ComplaintContext> options) : base(options) // db configuration(sql sever/postgresql),connection string
-        {
+        { 
         }
 
         public DbSet<Department> Departments { get; set; }

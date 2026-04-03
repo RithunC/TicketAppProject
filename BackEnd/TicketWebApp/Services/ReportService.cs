@@ -5,7 +5,7 @@ using TicketWebApp.Models.DTOs;
 
 namespace TicketWebApp.Services
 {
-    public class ReportService : IReportService
+    public class ReportService : IReportService //ReportService implements the interface IReportService.
     {
         private readonly IRepository<long, Ticket> _ticketRepo;
         private readonly IRepository<int, Status> _statusRepo;
@@ -53,14 +53,15 @@ namespace TicketWebApp.Services
                 {
                     t.Id,
                     StatusName = t.Status != null ? t.Status.Name : null,
+                    IsClosedState = t.Status != null && t.Status.IsClosedState,
                     PriorityName = t.Priority != null ? t.Priority.Name : null,
                     t.CurrentAssigneeUserId,
                     t.CreatedByUserId,
                     t.DueAt
                 })
-                .ToListAsync();
+                .ToListAsync(); //after this u have List<T> in server memory
 
-            var now = DateTime.UtcNow;
+            var now = DateTime.Now; // Use local time — DueAt stored as datetime2 (no timezone)
 
             bool IsStatus(string? s, string target) =>
                 !string.IsNullOrWhiteSpace(s) && s.Trim().Equals(target, StringComparison.OrdinalIgnoreCase);
@@ -77,12 +78,11 @@ namespace TicketWebApp.Services
             int mediumPriority = items.Count(t => string.Equals(t.PriorityName, "Medium", StringComparison.OrdinalIgnoreCase));
             int lowPriority = items.Count(t => string.Equals(t.PriorityName, "Low", StringComparison.OrdinalIgnoreCase));
 
-            // Overdue: DueAt < now and not terminal (Closed/Resolved)
+            // Overdue: DueAt < now and not in a closed/terminal state (uses IsClosedState flag, not hardcoded names)
             int overdue = items.Count(t =>
                 t.DueAt.HasValue
                 && t.DueAt.Value < now
-                && !IsStatus(t.StatusName, "Closed")
-                && !IsStatus(t.StatusName, "Resolved"));
+                && !t.IsClosedState);
 
             // Assigned to me (for Admin/Agent dashboards)
             int assignedToMe = (isAdmin || isAgent)

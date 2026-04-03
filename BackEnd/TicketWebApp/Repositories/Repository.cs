@@ -56,7 +56,7 @@ namespace TicketWebApp.Repositories
             }
             return null;
         }
-        // Repositories/Repository.cs
+     
         public IQueryable<T> GetQueryable()
         {
             return _context.Set<T>().AsQueryable();

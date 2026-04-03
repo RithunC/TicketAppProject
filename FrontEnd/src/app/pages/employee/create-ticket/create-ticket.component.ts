@@ -30,6 +30,7 @@ export class CreateTicketComponent implements OnInit {
   cats          = signal<CategoryDto[]>([]);
   prios         = signal<PriorityDto[]>([]);
   selectedFiles = signal<File[]>([]);
+    minDateTime: string = '';
 
   form = {
     title:        '',
@@ -52,6 +53,10 @@ export class CreateTicketComponent implements OnInit {
     this.ls.getDepartments().subscribe(d => this.depts.set(d));
     this.ls.getCategories().subscribe(c => this.cats.set(c));
     this.ls.getPriorities().subscribe(p => this.prios.set(p));
+  const now = new Date();
+  const offset = now.getTimezoneOffset();
+  const local = new Date(now.getTime() - offset * 60000);
+  this.minDateTime = local.toISOString().slice(0, 16);
   }
 
   onFileSelect(event: Event): void {
@@ -86,7 +91,7 @@ export class CreateTicketComponent implements OnInit {
       departmentId: this.form.departmentId,
       categoryId:   this.form.categoryId,
       priorityId:   this.form.priorityId,
-      dueAt:        this.form.dueAt || undefined
+      dueAt:        this.form.dueAt ? new Date(this.form.dueAt).toISOString() : undefined
     }).subscribe({
       next: ticket => {
         // Save ticket ID so employee can retrieve it later

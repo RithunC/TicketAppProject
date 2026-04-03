@@ -65,18 +65,18 @@ namespace TicketWebApp.Services
             {
                 TicketId = ticketId,
                 UploadedByUserId = uploadedByUserId,
-                FileName = file.FileName,
+                FileName = file.FileName, //saves original filename not guid name
                 ContentType = string.IsNullOrWhiteSpace(file.ContentType)
                     ? "application/octet-stream"
                     : file.ContentType,
-                FileSizeBytes = file.Length,
-                StoragePath = relPath,
+                FileSizeBytes = file.Length, //save file size in bytes
+                StoragePath = relPath, //This is stored in the database, not the physical path.
                 UploadedAt = DateTime.UtcNow
             };
 
-            await _attachRepo.Add(attachment);
+            await _attachRepo.Add(attachment); //save attachment to db
 
-            var by = await _userRepo.Get(uploadedByUserId);
+            var by = await _userRepo.Get(uploadedByUserId); //fetch uploaded user
             if (by == null)
                 throw new Exception("Uploaded-by user not found");
 
@@ -87,7 +87,7 @@ namespace TicketWebApp.Services
                 FileName = attachment.FileName,
                 ContentType = attachment.ContentType,
                 FileSizeBytes = attachment.FileSizeBytes,
-                StoragePath = attachment.StoragePath,
+                StoragePath = attachment.StoragePath, //relative file url
                 UploadedByUserId = uploadedByUserId,
                 UploadedByName = by.DisplayName,
                 UploadedAt = attachment.UploadedAt
@@ -131,7 +131,7 @@ namespace TicketWebApp.Services
             if (attachment == null)
                 throw new Exception("Attachment not found");
 
-            var fullPath = ResolvePhysicalPath(attachment.StoragePath);
+            var fullPath = ResolvePhysicalPath(attachment.StoragePath);//convert to physical path
             if (!File.Exists(fullPath))
                 throw new Exception("File not found on server");
 
@@ -171,7 +171,7 @@ namespace TicketWebApp.Services
             return true;
         }
 
-        private string ResolvePhysicalPath(string storagePath)
+        private string ResolvePhysicalPath(string storagePath) //prevent pathtraversal attacks
         {
             var wwwroot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
             var relative = storagePath.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
@@ -181,7 +181,7 @@ namespace TicketWebApp.Services
             if (!fullPath.StartsWith(rootFull, StringComparison.Ordinal))
                 throw new Exception("Invalid storage path");
 
-            return fullPath;
+            return fullPath; //Return safe absolute path
         }
 
         private async Task<bool> CanViewTicketAsync(long ticketId, long userId)
@@ -195,7 +195,7 @@ namespace TicketWebApp.Services
 
         private async Task<bool> CanDeleteAttachmentAsync(Attachment a, long userId)
         {
-            if (a.UploadedByUserId == userId)
+            if (a.UploadedByUserId == userId) //You can delete your own attachment
                 return true;
 
             var ticket = await _ticketRepo.Get(a.TicketId);

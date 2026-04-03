@@ -59,7 +59,7 @@
         <div class="sec-label"><span class="sec-num">03</span><span>Timeline (optional)</span></div>
         <div class="fg due-fg">
           <label>Due Date</label>
-          <input type="datetime-local" name="dueAt" [(ngModel)]="form.dueAt" class="fc" />
+          <input type="datetime-local" name="dueAt" [(ngModel)]="form.dueAt" class="fc" [min]="minDateTime"/>
         </div>
       </div>
 

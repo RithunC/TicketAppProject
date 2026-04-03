@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { TicketSummaryDto } from '../models';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: 'root' }) //make the service globally available
 export class ReportService {
   constructor(private http: HttpClient) {}
   getTicketSummary(): Observable<TicketSummaryDto> {

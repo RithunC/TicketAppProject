@@ -16,5 +16,7 @@ export class EmployeeDashboardComponent implements OnInit {
   auth = inject(AuthService);
   rpt  = inject(ReportService);
   summary = signal<TicketSummaryDto | null>(null);
-  ngOnInit(): void { this.rpt.getTicketSummary().subscribe(s => this.summary.set(s)); }
+  ngOnInit(): void { this.rpt.getTicketSummary().subscribe(s => this.summary.set(s));
+    
+   }
 }

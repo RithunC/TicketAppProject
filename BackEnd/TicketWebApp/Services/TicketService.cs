@@ -41,31 +41,33 @@ namespace TicketWebApp.Services
             if (statusNewId == 0)
                 throw new InvalidOperationException("Required status 'New' is not configured.");
 
-            var ticket = new Ticket //create object
+            var ticket = new Ticket //create object,creating new ticket entity
             {
-                DepartmentId = dto.DepartmentId,
+                DepartmentId = dto.DepartmentId, //Mapping DTO → Database entity.
                 CategoryId = dto.CategoryId,
                 PriorityId = dto.PriorityId,
-                StatusId = statusNewId,
+                StatusId = statusNewId, // sets default values = New
                 Title = dto.Title,
                 Description = dto.Description,
-                DueAt = dto.DueAt,
+                DueAt = dto.DueAt.HasValue
+                    ? DateTime.SpecifyKind(dto.DueAt.Value.ToUniversalTime(), DateTimeKind.Utc)
+                    : (DateTime?)null,
                 CreatedByUserId = createdByUserId,
                 CreatedAt = DateTime.UtcNow
             };
 
-            await _ticketRepo.Add(ticket);
+            await _ticketRepo.Add(ticket); //save to db the new ticket
 
-            var created = await _ticketRepo.GetQueryable()
+            var created = await _ticketRepo.GetQueryable() //reload ticket with related tables
                 .Include(t => t.Priority).Include(t => t.Status)
                 .Include(t => t.Department).Include(t => t.Category)
                 .Include(t => t.CreatedBy).Include(t => t.CurrentAssignee)
                 .FirstAsync(t => t.Id == ticket.Id);
 
-            return ToResponse(created);
+            return ToResponse(created); // convert to dto, ensures api never exposes entity directly for safety
         }
 
-        public async Task<TicketResponseDto?> GetAsync(long id)
+        public async Task<TicketResponseDto?> GetAsync(long id) //getting a ticket by id
         {
             var t = await _ticketRepo.GetQueryable()
                 .Include(x => x.Priority).Include(x => x.Status)
@@ -73,12 +75,12 @@ namespace TicketWebApp.Services
                 .Include(x => x.CreatedBy).Include(x => x.CurrentAssignee)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-            return t == null ? null : ToResponse(t);
+            return t == null ? null : ToResponse(t); //return null if not found
         }
 
-        public async Task<PagedResult<TicketListItemDto>> QueryAsync(TicketQueryDto q)
+        public async Task<PagedResult<TicketListItemDto>> QueryAsync(TicketQueryDto q) //filter,sort,pagination
         {
-            var query = _ticketRepo.GetQueryable()
+            var query = _ticketRepo.GetQueryable() //Builds base query,return Iqueryable
                 .Include(t => t.Priority)
                 .Include(t => t.Status)
                 .Include(t => t.Department)
@@ -87,7 +89,7 @@ namespace TicketWebApp.Services
                 .Include(t => t.CreatedBy)
                 .AsQueryable();
 
-            if (q.DepartmentId.HasValue) query = query.Where(t => t.DepartmentId == q.DepartmentId);
+            if (q.DepartmentId.HasValue) query = query.Where(t => t.DepartmentId == q.DepartmentId); //Applies filters ONLY when user requests it known as dynamic query building
             if (q.CategoryId.HasValue) query = query.Where(t => t.CategoryId == q.CategoryId);
             if (q.PriorityId.HasValue) query = query.Where(t => t.PriorityId == q.PriorityId);
             if (q.StatusId.HasValue) query = query.Where(t => t.StatusId == q.StatusId);
@@ -107,21 +109,22 @@ namespace TicketWebApp.Services
 
             var total = await query.CountAsync();
 
-            var items = await query.Skip((q.Page - 1) * q.PageSize).Take(q.PageSize)
-                .Select(t => new TicketListItemDto
+            var items = await query.Skip((q.Page - 1) * q.PageSize).Take(q.PageSize) //pagination
+                .Select(t => new TicketListItemDto //select only necessary fields in dto
                 {
                     Id = t.Id,
                     Title = t.Title,
                     Priority = t.Priority!.Name,
                     PriorityRank = t.Priority!.Rank,
                     Status = t.Status!.Name,
+                    IsClosedState = t.Status!.IsClosedState,
                     Department = t.Department != null ? t.Department.Name : null,
                     Category = t.Category != null ? t.Category.Name : null,
                     CreatedBy = t.CreatedBy!.DisplayName,
                     Assignee = t.CurrentAssignee != null ? t.CurrentAssignee.DisplayName : null,
                     CreatedAt = t.CreatedAt,
-                    DueAt = t.DueAt
-                }).ToListAsync();
+                    DueAt = t.DueAt //query building
+                }).ToListAsync(); //actual execution
 
             return new PagedResult<TicketListItemDto>
             {
@@ -142,12 +145,12 @@ namespace TicketWebApp.Services
             if (dto.PriorityId.HasValue) t.PriorityId = dto.PriorityId.Value;
             if (!string.IsNullOrWhiteSpace(dto.Title)) t.Title = dto.Title!;
             if (dto.Description != null) t.Description = dto.Description;
-            if (dto.DueAt.HasValue) t.DueAt = dto.DueAt;
+            if (dto.DueAt.HasValue) t.DueAt = DateTime.SpecifyKind(dto.DueAt.Value.ToUniversalTime(), DateTimeKind.Utc);
 
             t.UpdatedAt = DateTime.UtcNow;
-            await _ticketRepo.Update(id, t);
+            await _ticketRepo.Update(id, t); //update ticket in db
 
-            return await GetAsync(id);
+            return await GetAsync(id);//fetch updated ticket again
         }
 
         public async Task<bool> UpdateStatusAsync(long id, long changedByUserId, TicketStatusUpdateDto dto)
@@ -177,7 +180,7 @@ namespace TicketWebApp.Services
                 Note = dto.Note
             });
 
-            return true;
+            return true; //update successful
         }
 
         public async Task<TicketAssignmentResponseDto?> AssignAsync(long id, long assignedByUserId, TicketAssignRequestDto dto)

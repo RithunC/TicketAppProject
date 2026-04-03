@@ -7,7 +7,7 @@ namespace TicketWebApp.Services
 {
     public class UserService : IUserService
     {
-        private readonly IRepository<long, User> _userRepo;
+        private readonly IRepository<long, User> _userRepo; 
 
         public UserService(IRepository<long, User> userRepo)
         {
@@ -19,7 +19,7 @@ namespace TicketWebApp.Services
             var u = await _userRepo.GetQueryable()
                 .Include(x => x.Role)
                 .Include(x => x.Department)
-                .FirstOrDefaultAsync(x => x.Id == id);
+                .FirstOrDefaultAsync(x => x.Id == id); //executes the db query
 
             if (u == null)
                 throw new Exception("User not found");
@@ -41,14 +41,14 @@ namespace TicketWebApp.Services
             var query = _userRepo.GetQueryable()
                 .Include(u => u.Role)
                 .Include(u => u.Department)
-                .Where(u => u.IsActive && u.Role!.Name == "Agent");
+                .Where(u => u.IsActive && u.Role!.Name == "Agent"); //Loads all active users whose role is "Agent".
 
             if (departmentId.HasValue)
                 query = query.Where(u => u.DepartmentId == departmentId);
 
             var list = await query
                 .OrderBy(u => u.DisplayName)
-                .Select(u => new UserLiteDto
+                .Select(u => new UserLiteDto //convert each entity into a DTO
                 {
                     Id = u.Id,
                     DisplayName = u.DisplayName,
@@ -68,7 +68,7 @@ namespace TicketWebApp.Services
 
         public async Task<UserLiteDto?> UpdateProfileAsync(long userId, UpdateProfileDto model)
         {
-            var u = await _userRepo.GetQueryable()
+            var u = await _userRepo.GetQueryable() 
                 .Include(x => x.Role)
                 .Include(x => x.Department)
                 .FirstOrDefaultAsync(x => x.Id == userId);

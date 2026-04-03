@@ -16,7 +16,7 @@ namespace TicketWebApp.Middleware
 
         public async Task Invoke(HttpContext context, IAuditLogService audit)
         {
-            var start = DateTime.UtcNow;
+            var start = DateTime.UtcNow; //calculates how long req took
 
             await _next(context);
 
@@ -24,9 +24,9 @@ namespace TicketWebApp.Middleware
             var action = context.Request.RouteValues["action"]?.ToString() ?? "";
             var entityId = context.Request.RouteValues["id"]?.ToString();
 
-            if (controller == "AuditLogs") return;
+            if (controller == "AuditLogs") return; //prevent Infinite logging loop
 
-            int status = context.Response.StatusCode;
+            int status = context.Response.StatusCode; //get response status
 
             string friendlyAction = GetFriendlyAction(controller, action);
             string friendlyEntity = GetFriendlyEntity(controller);
@@ -38,7 +38,7 @@ namespace TicketWebApp.Middleware
             string? userName = context.User.Identity?.Name;
             string? role = context.User.FindFirst(ClaimTypes.Role)?.Value;
 
-            var log = new AuditLog
+            var log = new AuditLog //create auditlog object
             {
                 ActorUserId = userId,
                 ActorUserName = userName,
@@ -62,7 +62,7 @@ namespace TicketWebApp.Middleware
                 })
             };
 
-            await audit.LogAsync(log);
+            await audit.LogAsync(log); //save log
         }
 
         private static string GetFriendlyAction(string controller, string action)

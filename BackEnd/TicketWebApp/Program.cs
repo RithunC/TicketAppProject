@@ -9,14 +9,17 @@ using TicketWebApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // 1) Controllers + (basic) Swagger
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-// 1) Controllers + (basic) Swagger
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(opts =>
+    {
+        // Serialize DateTime as UTC with Z suffix so frontend always gets unambiguous strings
+        opts.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(); //Enables Swagger UI so you can test your APIs.
 
 // 2) DbContext (SQL Server)
 builder.Services.AddDbContext<ComplaintContext>(options =>
@@ -24,7 +27,7 @@ builder.Services.AddDbContext<ComplaintContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Development"));
 });
 
-// 3) CORS (open policy, like FirstAPI)
+// 3) CORS (open policy, like FirstAPI) cross origin resource sharing
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -54,22 +57,22 @@ builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-// 6) Authentication (JWT) – only JwtBearer is required
+// 6) Authentication (JWT) ï¿½ only JwtBearer is required
 string jwtKey = builder.Configuration["Keys:Jwt"]
     ?? throw new InvalidOperationException("Secret key not found in configuration. Add Keys:Jwt in appsettings.json");
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme) //Authorization: Bearer <token>
     .AddJwtBearer(options =>
     {
         options.RequireHttpsMetadata = false; // set true in prod behind HTTPS
-        options.SaveToken = true;
+        options.SaveToken = true; //Stores token in HttpContext
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+            ValidateIssuer = false, //Skips checking who issued the token
+            ValidateAudience = false, //Skips checking who the token is for
+            ValidateLifetime = true, //Checks if token is expired
+            ValidateIssuerSigningKey = true, //Verifies token signature using secret key
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)) 
         };
     });
 
@@ -94,6 +97,6 @@ app.UseMiddleware<TicketWebApp.Middleware.ExceptionMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapControllers(); //route matching and controller execution
 
 app.Run();

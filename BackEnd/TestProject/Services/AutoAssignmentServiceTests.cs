@@ -1,6 +1,4 @@
-using Moq;
 using TestProject.Helpers;
-using TicketWebApp.Interfaces;
 using TicketWebApp.Models;
 using TicketWebApp.Repositories;
 using TicketWebApp.Services;
@@ -48,15 +46,12 @@ namespace TestProject.Services
             );
             await ctx.SaveChangesAsync();
 
-            // Give agent1 an existing open ticket
             var existing = await ticketSvc.CreateAsync(1, new TicketCreateDto { Title = "Existing", PriorityId = 1 });
             await ticketSvc.AssignAsync(existing.Id, 1, new TicketAssignRequestDto { AssignedToUserId = 2 });
 
-            // Create new ticket and auto-assign
             var newTicket = await ticketSvc.CreateAsync(1, new TicketCreateDto { Title = "New", PriorityId = 1 });
             var result = await sut.AutoAssignAsync(newTicket.Id, 1);
 
-            // agent2 has 0 open tickets, should be chosen
             Assert.NotNull(result);
             Assert.Equal(3, result!.AssignedToUserId);
         }
@@ -96,6 +91,60 @@ namespace TestProject.Services
             var result = await sut.AutoAssignAsync(ticketId: 999, assignedByUserId: 1);
 
             Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task AutoAssignAsync_FiltersByDepartmentFromRequest()
+        {
+            var (sut, ctx, ticketSvc) = Build(nameof(AutoAssignAsync_FiltersByDepartmentFromRequest));
+            ctx.Departments.Add(new Department { Id = 2, Name = "HR" });
+            ctx.Users.AddRange(
+                MakeUser(1, "admin", roleId: 1, deptId: 1),
+                MakeUser(2, "agent_it", roleId: 2, deptId: 1),
+                MakeUser(3, "agent_hr", roleId: 2, deptId: 2)
+            );
+            await ctx.SaveChangesAsync();
+
+            var ticket = await ticketSvc.CreateAsync(1, new TicketCreateDto { Title = "T", PriorityId = 1 });
+            var result = await sut.AutoAssignAsync(ticket.Id, 1,
+                new TicketAutoAssignRequestDto { DepartmentId = 2 });
+
+            Assert.NotNull(result);
+            Assert.Equal(3, result!.AssignedToUserId);
+        }
+
+        [Fact]
+        public async Task AutoAssignAsync_UsesTicketDepartmentWhenNoRequestDepartment()
+        {
+            var (sut, ctx, ticketSvc) = Build(nameof(AutoAssignAsync_UsesTicketDepartmentWhenNoRequestDepartment));
+            ctx.Users.AddRange(
+                MakeUser(1, "admin", roleId: 1, deptId: 1),
+                MakeUser(2, "agent_it", roleId: 2, deptId: 1)
+            );
+            await ctx.SaveChangesAsync();
+
+            var ticket = await ticketSvc.CreateAsync(1, new TicketCreateDto { Title = "T", PriorityId = 1, DepartmentId = 1 });
+            var result = await sut.AutoAssignAsync(ticket.Id, 1);
+
+            Assert.NotNull(result);
+            Assert.Equal(2, result!.AssignedToUserId);
+        }
+
+        [Fact]
+        public async Task AutoAssignAsync_WithCustomNote_UsesNote()
+        {
+            var (sut, ctx, ticketSvc) = Build(nameof(AutoAssignAsync_WithCustomNote_UsesNote));
+            ctx.Users.AddRange(
+                MakeUser(1, "admin", roleId: 1),
+                MakeUser(2, "agent", roleId: 2)
+            );
+            await ctx.SaveChangesAsync();
+
+            var ticket = await ticketSvc.CreateAsync(1, new TicketCreateDto { Title = "T", PriorityId = 1 });
+            var result = await sut.AutoAssignAsync(ticket.Id, 1,
+                new TicketAutoAssignRequestDto { Note = "Custom note" });
+
+            Assert.NotNull(result);
         }
     }
 }

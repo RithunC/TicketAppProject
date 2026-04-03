@@ -18,6 +18,6 @@
         public int CompareTo(Attachment? other) => other != null ? Id.CompareTo(other.Id) : 1;
         public bool Equals(Attachment? other) => other != null && Id == other.Id;
         public override string ToString()
-            => $"Id: {Id}, TicketId: {TicketId}, File: {FileName} ({ContentType}), Size: {FileSizeBytes}B";
+            => $"Id: {Id}, TicketId: {TicketId}, File: {FileName} ({ContentType}), Size: {FileSizeBytes}B"; //size in bytes
     }
 }

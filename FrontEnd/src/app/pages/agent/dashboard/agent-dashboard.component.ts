@@ -49,8 +49,7 @@ export class AgentDashboardComponent implements OnInit {
         resolved:     items.filter(t => t.status.toLowerCase() === 'resolved').length,
         overdue:      items.filter(t =>
                         !!t.dueAt && new Date(t.dueAt) < now &&
-                        t.status.toLowerCase() !== 'closed' &&
-                        t.status.toLowerCase() !== 'resolved').length,
+                        !t.isClosedState).length,
       });
     });
   }

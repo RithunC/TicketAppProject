@@ -201,6 +201,39 @@ namespace TestProject.Services
             Assert.False(result.Success);
         }
 
+        [Fact]
+        public async Task ForgotPasswordAsync_FailsWhenUserNameOrEmailEmpty()
+        {
+            var (sut, _) = Build(nameof(ForgotPasswordAsync_FailsWhenUserNameOrEmailEmpty));
+
+            var result = await sut.ForgotPasswordAsync(new AuthDtos.ForgotPasswordRequestDto
+            {
+                UserNameOrEmail = ""
+            });
+
+            Assert.False(result.Success);
+            Assert.Contains("required", result.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public async Task ForgotPasswordAsync_FindsByEmail()
+        {
+            var (sut, _) = Build(nameof(ForgotPasswordAsync_FindsByEmail));
+            await sut.RegisterAsync(new AuthDtos.RegisterUserRequestDto
+            {
+                UserName = "henry", Email = "henry@example.com", DisplayName = "Henry",
+                Password = "Pass@123", RoleName = "Employee"
+            });
+
+            var result = await sut.ForgotPasswordAsync(new AuthDtos.ForgotPasswordRequestDto
+            {
+                UserNameOrEmail = "henry@example.com"
+            });
+
+            Assert.True(result.Success);
+            Assert.False(string.IsNullOrWhiteSpace(result.ResetToken));
+        }
+
         // ── ResetPassword ─────────────────────────────────────────────────────
 
         [Fact]
@@ -249,6 +282,71 @@ namespace TestProject.Services
             });
 
             Assert.False(result.Success);
+        }
+
+        [Fact]
+        public async Task ResetPasswordAsync_FailsWhenTokenEmpty()
+        {
+            var (sut, _) = Build(nameof(ResetPasswordAsync_FailsWhenTokenEmpty));
+
+            var result = await sut.ResetPasswordAsync(new AuthDtos.ResetPasswordRequestDto
+            {
+                Token = "",
+                NewPassword = "NewPass@456"
+            });
+
+            Assert.False(result.Success);
+            Assert.Contains("required", result.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public async Task ResetPasswordAsync_FailsWhenNewPasswordEmpty()
+        {
+            var (sut, _) = Build(nameof(ResetPasswordAsync_FailsWhenNewPasswordEmpty));
+
+            var result = await sut.ResetPasswordAsync(new AuthDtos.ResetPasswordRequestDto
+            {
+                Token = "sometoken",
+                NewPassword = ""
+            });
+
+            Assert.False(result.Success);
+            Assert.Contains("required", result.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public async Task RegisterAsync_FailsWhenEmailAlreadyExists()
+        {
+            var (sut, _) = Build(nameof(RegisterAsync_FailsWhenEmailAlreadyExists));
+            await sut.RegisterAsync(new AuthDtos.RegisterUserRequestDto
+            {
+                UserName = "user1", Email = "shared@example.com", DisplayName = "User1",
+                Password = "Pass@123", RoleName = "Employee"
+            });
+
+            var result = await sut.RegisterAsync(new AuthDtos.RegisterUserRequestDto
+            {
+                UserName = "user2", Email = "shared@example.com", DisplayName = "User2",
+                Password = "Pass@123", RoleName = "Employee"
+            });
+
+            Assert.False(result.Success);
+            Assert.Contains("Email", result.Message);
+        }
+
+        [Fact]
+        public async Task RegisterAsync_FailsForInvalidDepartmentName()
+        {
+            var (sut, _) = Build(nameof(RegisterAsync_FailsForInvalidDepartmentName));
+
+            var result = await sut.RegisterAsync(new AuthDtos.RegisterUserRequestDto
+            {
+                UserName = "user3", Email = "user3@example.com", DisplayName = "User3",
+                Password = "Pass@123", RoleName = "Employee", DepartmentName = "NonExistentDept"
+            });
+
+            Assert.False(result.Success);
+            Assert.Contains("DepartmentName", result.Message);
         }
     }
 }

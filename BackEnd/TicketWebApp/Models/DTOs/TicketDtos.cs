@@ -52,6 +52,7 @@
             public int PriorityRank { get; set; }
 
             public string Status { get; set; } = string.Empty;
+            public bool IsClosedState { get; set; }
 
             public string? Department { get; set; }
             public string? Category { get; set; }

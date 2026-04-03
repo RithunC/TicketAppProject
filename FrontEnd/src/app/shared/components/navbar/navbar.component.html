@@ -24,7 +24,7 @@
   }
 
   <!-- Theme toggle -->
-  <button class="theme-btn" (click)="theme.toggle()" [title]="theme.theme()==='dark' ? 'Switch to light' : 'Switch to dark'">
+   <button class="theme-btn" (click)="theme.toggle()" [title]="theme.theme()==='dark' ? 'Switch to light' : 'Switch to dark'">
     @if (theme.theme() === 'dark') { <i class="bi bi-sun-fill"></i> }
     @else { <i class="bi bi-moon-fill"></i> }
   </button>

@@ -8,9 +8,9 @@ using static TicketWebApp.Models.DTOs.TicketDtos;
 
 namespace TicketWebApp.Controllers
 {
-    [Route("api/tickets")]
-    [ApiController]
-    [Authorize]
+    [Route("api/tickets")] //baseurl
+    [ApiController] //auto validation and binding
+    [Authorize] //all endpoints require login
     public class TicketsController : ControllerBase
     {
         private readonly ITicketService _tickets;
@@ -22,10 +22,10 @@ namespace TicketWebApp.Controllers
             _autoAssign = autoAssign;
         }
 
-        private long? CurrentUserId()
+        private long? CurrentUserId() //extracts userid from jwt token
         {
-            var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return long.TryParse(id, out var uid) ? uid : (long?)null;
+            var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; //grt logged in userid
+            return long.TryParse(id, out var uid) ? uid : (long?)null; //conversion succeeds return uid
         }
 
         // --------------------------------------------------------------

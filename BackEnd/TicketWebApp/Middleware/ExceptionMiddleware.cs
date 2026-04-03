@@ -4,14 +4,13 @@ using TicketWebApp.Models;
 
 namespace TicketWebApp.Middleware
 {
-    /// <summary>
     /// Global exception middleware that logs unhandled errors to Errorlogs table
     /// and returns a clean 500 JSON response.
-    /// </summary>
+ 
     public class ExceptionMiddleware
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger<ExceptionMiddleware> _logger;
+        private readonly RequestDelegate _next; //Without calling this → request stops here
+        private readonly ILogger<ExceptionMiddleware> _logger; //log errors
 
         public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
         {
@@ -36,7 +35,7 @@ namespace TicketWebApp.Middleware
                     db.Errorlogs.Add(new ErrorLog
                     {
                         ErrorMessage = ex.Message,
-                        ErrorNumber = ex.HResult,
+                        ErrorNumber = ex.HResult, 
                         CreatedAt = DateTime.UtcNow
                     });
                     await db.SaveChangesAsync();
