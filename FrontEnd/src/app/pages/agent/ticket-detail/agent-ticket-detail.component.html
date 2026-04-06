@@ -45,33 +45,64 @@
         <!-- Comments -->
         <div class="card">
           <div class="ch"><h3><i class="bi bi-chat-dots"></i> Comments ({{ comments().length }})</h3></div>
-          <div class="cb">
-            <div class="cform">
-              <textarea [(ngModel)]="newComment" rows="3" placeholder="Write a comment…" class="cta"></textarea>
-              <div class="cfooter">
+          <div class="cb chat-cb">
+            <!-- Feed -->
+            <div class="chat-feed">
+              @for (c of comments(); track c.id) {
+                <div class="chat-msg" [class.mine]="c.postedByUserId === myId" [class.theirs]="c.postedByUserId !== myId">
+                  @if (c.postedByUserId !== myId) {
+                    <div class="chat-av">{{ c.postedByName[0]?.toUpperCase() }}</div>
+                  }
+                  <div class="chat-bubble-wrap">
+                    <div class="chat-meta-top">
+                      @if (c.postedByUserId !== myId) { <span class="chat-sender">{{ c.postedByName }}</span> }
+                      @if (c.isInternal) { <span class="itag">Internal</span> }
+                      <span class="chat-time">{{ c.createdAt | date:'MMM d, h:mm a' }}</span>
+                    </div>
+                    <div class="chat-bubble" [class.internal-bubble]="c.isInternal">
+                      <p class="chat-text">{{ c.body }}</p>
+                      @if (c.postedByUserId === myId) {
+                        <button class="chat-del" (click)="deleteComment(c)" [disabled]="deletingCommentId() === c.id" title="Delete">
+                          @if (deletingCommentId() === c.id) { <span class="spin-sm"></span> }
+                          @else { <i class="bi bi-trash3"></i> }
+                        </button>
+                      }
+                    </div>
+                  </div>
+                  @if (c.postedByUserId === myId) {
+                    <div class="chat-av mine-av">{{ c.postedByName[0]?.toUpperCase() }}</div>
+                  }
+                </div>
+              } @empty {
+                <div class="chat-empty"><i class="bi bi-chat-square-dots"></i><span>No messages yet.</span></div>
+              }
+            </div>
+
+            <!-- Composer -->
+            <div class="chat-composer" [class.has-draft]="newComment.trim().length > 0">
+              @if (newComment.trim().length > 0) {
+                <span class="draft-badge"><i class="bi bi-pencil-fill"></i> Draft</span>
+              }
+              <textarea
+                [(ngModel)]="newComment"
+                (ngModelChange)="onDraftChange()"
+                rows="2"
+                placeholder="Type a message…"
+                class="chat-input"
+                (keydown)="onCommentKeydown($any($event))"
+              ></textarea>
+              <div class="chat-actions">
                 <label class="chk">
                   <input type="checkbox" [(ngModel)]="isInternal" />
                   <span>Internal note</span>
                 </label>
-                <button class="btn-pri" (click)="addComment()" [disabled]="!newComment.trim()">
-                  <i class="bi bi-send"></i> Post
+                <button class="chat-clear" (click)="clearDraft()" [disabled]="!newComment.trim()" title="Clear draft">
+                  <i class="bi bi-x-lg"></i> Clear
+                </button>
+                <button class="chat-submit" (click)="addComment()" [disabled]="!newComment.trim()">
+                  <i class="bi bi-send-fill"></i> Submit
                 </button>
               </div>
-            </div>
-            <div class="clist">
-              @for (c of comments(); track c.id) {
-                <div class="ci" [class.int]="c.isInternal">
-                  <div class="cav">{{ c.postedByName[0] }}</div>
-                  <div class="cbody">
-                    <div class="cmeta">
-                      <span class="cname">{{ c.postedByName }}</span>
-                      @if (c.isInternal) { <span class="itag">Internal</span> }
-                      <span class="ctime">{{ c.createdAt | date:'MMM d, h:mm a' }}</span>
-                    </div>
-                    <p class="ctext">{{ c.body }}</p>
-                  </div>
-                </div>
-              } @empty { <p class="empty-msg">No comments yet.</p> }
             </div>
           </div>
         </div>

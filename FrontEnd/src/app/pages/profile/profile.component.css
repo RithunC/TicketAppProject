@@ -125,3 +125,55 @@
   .profile-grid { grid-template-columns: 1fr; }
   .info-grid { grid-template-columns: 1fr; }
 }
+
+/* ── Draft Tickets Section ── */
+.drafts-section {
+  max-width: 960px; margin-top: 32px;
+}
+.drafts-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+}
+.drafts-title {
+  font-size: 16px; font-weight: 700; color: var(--primary); margin: 0;
+  display: flex; align-items: center; gap: 8px;
+}
+.drafts-title i { color: var(--primary-lt); }
+.drafts-count {
+  padding: 2px 10px; background: rgba(33,61,87,.1); border-radius: 99px;
+  font-size: 12px; font-weight: 600; color: var(--primary-lt);
+}
+.drafts-list { display: flex; flex-direction: column; gap: 10px; }
+.draft-card {
+  display: flex; align-items: center; gap: 16px;
+  background: var(--white); border: 1px solid var(--border);
+  border-left: 4px solid var(--primary-lt);
+  border-radius: var(--radius-lg); padding: 16px 20px;
+  box-shadow: var(--shadow-sm); transition: border-color .15s;
+}
+.draft-card:hover { border-left-color: var(--primary); }
+.draft-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.draft-title { font-size: 14px; font-weight: 600; color: var(--primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.draft-desc  { font-size: 13px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.draft-meta  { font-size: 11px; color: var(--text-faint); display: flex; align-items: center; gap: 5px; }
+.draft-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.btn-continue {
+  padding: 7px 16px; background: var(--primary); border: none;
+  border-radius: var(--radius-sm); color: #fff; font-size: 13px; font-weight: 600;
+  font-family: inherit; cursor: pointer; display: inline-flex; align-items: center;
+  gap: 6px; transition: background .15s;
+}
+.btn-continue:hover { background: var(--primary-md); }
+.btn-discard {
+  padding: 7px 14px; background: var(--white); border: 1.5px solid #fca5a5;
+  border-radius: var(--radius-sm); color: #dc2626; font-size: 13px; font-weight: 600;
+  font-family: inherit; cursor: pointer; display: inline-flex; align-items: center;
+  gap: 6px; transition: all .15s;
+}
+.btn-discard:hover { background: #fee2e2; }
+
+@media (max-width: 600px) {
+  .draft-card { flex-direction: column; align-items: flex-start; }
+  .draft-actions { width: 100%; }
+  .btn-continue, .btn-discard { flex: 1; justify-content: center; }
+}
+.draft-files { display: inline-flex; align-items: center; gap: 4px; color: var(--primary-lt); }

@@ -37,7 +37,11 @@ export class EmpTicketDetailComponent implements OnInit {
   attachments = signal<AttachmentResponseDto[]>([]);
   history     = signal<TicketStatusHistoryDto[]>([]);
   newComment  = '';
+  isDraft     = false;
+  deletingCommentId = signal<number | null>(null);
   deletingAttachId  = signal<number | null>(null);
+
+  private get draftKey(): string { return `comment_draft_${this.tid}`; }
   previewAttachment = signal<AttachmentResponseDto | null>(null);
 
   get tid(): number { return +this.route.snapshot.paramMap.get('id')!; }
@@ -47,7 +51,10 @@ export class EmpTicketDetailComponent implements OnInit {
     return s === 'closed' || s === 'resolved';
   }
 
-  ngOnInit(): void { this.loadAll(); }
+  ngOnInit(): void {
+    this.newComment = localStorage.getItem(this.draftKey) ?? '';
+    this.loadAll();
+  }
 
   loadAll(): void {
     this.ts.get(this.tid).subscribe({
@@ -65,10 +72,12 @@ export class EmpTicketDetailComponent implements OnInit {
   addComment(): void {
     const body = this.newComment.trim();
     if (!body) return;
+    this.isDraft = false;
     this.cs.add({ ticketId: this.tid, body, isInternal: false }).subscribe({
       next: () => {
         this.toast.success('Comment posted!');
         this.newComment = '';
+        localStorage.removeItem(this.draftKey);
         this.cs.getByTicket(this.tid).subscribe(c => this.comments.set(c));
       },
       error: (err) => {
@@ -76,6 +85,26 @@ export class EmpTicketDetailComponent implements OnInit {
         if (typeof msg === 'string' && msg) this.toast.error(msg);
       }
     });
+  }
+
+  deleteComment(c: CommentResponseDto): void {
+    if (this.deletingCommentId() !== null) return;
+    this.deletingCommentId.set(c.id);
+    this.cs.delete(c.id).subscribe({
+      next: () => {
+        this.comments.update(list => list.filter(x => x.id !== c.id));
+        this.deletingCommentId.set(null);
+      },
+      error: () => this.deletingCommentId.set(null)
+    });
+  }
+
+  clearDraft(): void { this.newComment = ''; this.isDraft = false; localStorage.removeItem(this.draftKey); }
+
+  onDraftChange(): void { localStorage.setItem(this.draftKey, this.newComment); }
+
+  onCommentKeydown(e: KeyboardEvent): void {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.addComment(); }
   }
 
   onFile(event: Event): void {

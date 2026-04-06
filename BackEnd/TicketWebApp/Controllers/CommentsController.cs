@@ -91,6 +91,27 @@ namespace TicketWebApp.Controllers
             try
             {
                 var res = await _comments.AddAsync(postedByUserId, dto);
+
+                // Auto-reply when a non-staff user (employee) submits a comment
+                if (!isStaff)
+                {
+                    var autoReply = new CommentCreateDto
+                    {
+                        TicketId = dto.TicketId,
+                        Body = "Thank you for your message. Our support team has received your query and will get back to you shortly.",
+                        IsInternal = false
+                    };
+                    // Post as the assigned agent if available, otherwise as the ticket creator's first admin/agent
+                    var responderId = ticketRow.Ticket.CurrentAssigneeUserId
+                        ?? await _ctx.Users
+                            .Where(u => u.IsActive && (u.Role!.Name == "Agent" || u.Role!.Name == "Admin"))
+                            .Select(u => (long?)u.Id)
+                            .FirstOrDefaultAsync();
+
+                    if (responderId.HasValue)
+                        await _comments.AddAsync(responderId.Value, autoReply);
+                }
+
                 return Ok(res);
             }
             catch (InvalidOperationException ex)

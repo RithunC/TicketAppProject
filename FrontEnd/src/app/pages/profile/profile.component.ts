@@ -1,16 +1,18 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LowerCasePipe } from '@angular/common';
+import { DatePipe, LowerCasePipe, SlicePipe } from '@angular/common';
+import { Router } from '@angular/router';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 import { UserLiteDto } from '../../models';
+import { TicketDraft } from '../employee/create-ticket/create-ticket.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [FormsModule, NavbarComponent, LowerCasePipe],
+  imports: [FormsModule, NavbarComponent, LowerCasePipe, DatePipe, SlicePipe],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
@@ -18,21 +20,46 @@ export class ProfileComponent implements OnInit {
   userSvc = inject(UserService);
   auth    = inject(AuthService);
   toast   = inject(ToastService);
+  router  = inject(Router);
 
   private readonly PHONE_KEY = 'profile_phone';
 
   profile  = signal<UserLiteDto | null>(null);
   editing  = signal(false);
   saving   = signal(false);
+  drafts   = signal<TicketDraft[]>([]);
 
   editForm = { displayName: '', phone: '' };
+
+  get isEmployee(): boolean { return this.auth.role() === 'Employee'; }
+
+  private get draftsKey(): string {
+    const uid = this.auth.currentUser()?.id ?? 0;
+    return `ticket_drafts_${uid}`;
+  }
 
   initials(): string {
     const n = this.profile()?.displayName ?? '';
     return n.split(' ').map(x => x[0]).slice(0,2).join('').toUpperCase() || 'U';
   }
 
-  ngOnInit(): void { this.loadProfile(); }
+  ngOnInit(): void { this.loadProfile(); this.loadDrafts(); }
+
+  loadDrafts(): void {
+    try { this.drafts.set(JSON.parse(localStorage.getItem(this.draftsKey) ?? '[]')); }
+    catch { this.drafts.set([]); }
+  }
+
+  continueDraft(d: TicketDraft): void {
+    this.router.navigate(['/employee/create-ticket'], { state: { draftId: d.id } });
+  }
+
+  discardDraft(d: TicketDraft): void {
+    const updated = this.drafts().filter(x => x.id !== d.id);
+    localStorage.setItem(this.draftsKey, JSON.stringify(updated));
+    this.drafts.set(updated);
+    this.toast.success('Draft discarded.');
+  }
 
   loadProfile(): void {
     this.userSvc.getMe().subscribe({

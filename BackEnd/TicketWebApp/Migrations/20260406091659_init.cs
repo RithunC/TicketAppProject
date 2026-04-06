@@ -12,6 +12,35 @@ namespace TicketWebApp.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "AuditLogs",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ActorUserId = table.Column<long>(type: "bigint", nullable: true),
+                    ActorUserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ActorRole = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Action = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    EntityType = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    EntityId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Success = table.Column<bool>(type: "bit", nullable: false),
+                    StatusCode = table.Column<int>(type: "int", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HttpMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Path = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClientIp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserAgent = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CorrelationId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OccurredAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    MetadataJson = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuditLogs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Categories",
                 columns: table => new
                 {
@@ -43,6 +72,21 @@ namespace TicketWebApp.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Departments", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Errorlogs",
+                columns: table => new
+                {
+                    ErrorId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ErrorMessage = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ErrorNumber = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Errorlogs", x => x.ErrorId);
                 });
 
             migrationBuilder.CreateTable(
@@ -329,6 +373,21 @@ namespace TicketWebApp.Migrations
                 column: "UploadedByUserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AuditLog_Actor",
+                table: "AuditLogs",
+                column: "ActorUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AuditLog_Entity",
+                table: "AuditLogs",
+                columns: new[] { "EntityType", "EntityId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AuditLog_OccurredAt",
+                table: "AuditLogs",
+                column: "OccurredAtUtc");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Categories_ParentCategoryId",
                 table: "Categories",
                 column: "ParentCategoryId");
@@ -467,7 +526,13 @@ namespace TicketWebApp.Migrations
                 name: "Attachments");
 
             migrationBuilder.DropTable(
+                name: "AuditLogs");
+
+            migrationBuilder.DropTable(
                 name: "Comments");
+
+            migrationBuilder.DropTable(
+                name: "Errorlogs");
 
             migrationBuilder.DropTable(
                 name: "TicketAssignments");

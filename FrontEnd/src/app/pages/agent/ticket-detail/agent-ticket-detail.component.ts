@@ -10,6 +10,7 @@ import { AttachmentService } from '../../../services/attachment.service';
 import { AttachmentPreviewComponent } from '../../../shared/components/attachment-preview/attachment-preview.component';
 import { LookupService } from '../../../services/lookup.service';
 import { ToastService } from '../../../services/toast.service';
+import { AuthService } from '../../../services/auth.service';
 import {
   TicketResponseDto, CommentResponseDto, AttachmentResponseDto,
   TicketStatusHistoryDto, StatusDto
@@ -28,6 +29,9 @@ export class AgentTicketDetailComponent implements OnInit {
   attachSvc = inject(AttachmentService);
   ls        = inject(LookupService);
   toast     = inject(ToastService);
+  auth      = inject(AuthService);
+
+  get myId(): number { return this.auth.currentUser()?.id ?? 0; }
 
   ticket      = signal<TicketResponseDto | null>(null);
   comments    = signal<CommentResponseDto[]>([]);
@@ -41,11 +45,15 @@ export class AgentTicketDetailComponent implements OnInit {
   closePreview(): void { this.previewAttachment.set(null); }
 
   newStatusId = 0; statusNote = ''; newComment = ''; isInternal = false;
+  isDraft = false;
+  deletingCommentId = signal<number | null>(null);
 
   get tid(): number { return +this.route.snapshot.paramMap.get('id')!; }
+  private get draftKey(): string { return `comment_draft_${this.tid}`; }
 
   ngOnInit(): void {
     this.ls.getStatuses().subscribe(s => this.statuses.set(s));
+    this.newComment = localStorage.getItem(this.draftKey) ?? '';
     this.loadAll();
   }
 
@@ -64,9 +72,27 @@ export class AgentTicketDetailComponent implements OnInit {
 
   addComment(): void {
     if (!this.newComment.trim()) return;
+    this.isDraft = false;
     this.cs.add({ ticketId: this.tid, body: this.newComment.trim(), isInternal: this.isInternal }).subscribe({
-      next: () => { this.toast.success('Comment posted!'); this.newComment = ''; this.isInternal = false; this.cs.getByTicket(this.tid).subscribe(c => this.comments.set(c)); }
+      next: () => { this.toast.success('Comment posted!'); this.newComment = ''; this.isInternal = false; localStorage.removeItem(this.draftKey); this.cs.getByTicket(this.tid).subscribe(c => this.comments.set(c)); }
     });
+  }
+
+  deleteComment(c: CommentResponseDto): void {
+    if (this.deletingCommentId() !== null) return;
+    this.deletingCommentId.set(c.id);
+    this.cs.delete(c.id).subscribe({
+      next: () => { this.comments.update(list => list.filter(x => x.id !== c.id)); this.deletingCommentId.set(null); },
+      error: () => this.deletingCommentId.set(null)
+    });
+  }
+
+  clearDraft(): void { this.newComment = ''; this.isDraft = false; localStorage.removeItem(this.draftKey); }
+
+  onDraftChange(): void { localStorage.setItem(this.draftKey, this.newComment); }
+
+  onCommentKeydown(e: KeyboardEvent): void {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.addComment(); }
   }
 
   onFile(event: Event): void {
