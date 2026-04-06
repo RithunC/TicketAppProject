@@ -12,8 +12,8 @@ using TicketWebApp.Contexts;
 namespace TicketWebApp.Migrations
 {
     [DbContext(typeof(ComplaintContext))]
-    [Migration("20260325095026_auditLogs")]
-    partial class auditLogs
+    [Migration("20260406091659_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

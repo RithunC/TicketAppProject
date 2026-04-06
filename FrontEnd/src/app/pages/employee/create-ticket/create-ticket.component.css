@@ -100,3 +100,19 @@
   transition: all .15s; flex-shrink: 0;
 }
 .file-remove:hover { background: #fee2e2; border-color: #fca5a5; color: #dc2626; }
+
+.ph-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.draft-indicator {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; color: var(--primary-lt);
+  background: rgba(33,61,87,.08); padding: 5px 12px; border-radius: 99px;
+  margin-top: 6px;
+}
+.btn-draft {
+  padding: 11px 20px; background: var(--white); border: 1.5px solid var(--primary-lt);
+  border-radius: var(--radius); color: var(--primary); font-size: 14px; font-weight: 600;
+  font-family: inherit; cursor: pointer; display: inline-flex; align-items: center;
+  gap: 7px; transition: all .15s;
+}
+.btn-draft:hover:not(:disabled) { background: var(--primary); color: #fff; border-color: var(--primary); }
+.btn-draft:disabled { opacity: .4; cursor: not-allowed; }

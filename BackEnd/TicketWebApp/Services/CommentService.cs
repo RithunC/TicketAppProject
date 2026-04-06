@@ -68,7 +68,7 @@ namespace TicketWebApp.Services
             var list = await _commentRepo.GetQueryable()
                 .Include(c => c.PostedBy)
                 .Where(c => c.TicketId == ticketId)
-                .OrderByDescending(c => c.CreatedAt)
+                .OrderBy(c => c.CreatedAt)
                 .ToListAsync();
 
             return list.Select(c => new CommentResponseDto
