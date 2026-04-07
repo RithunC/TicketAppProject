@@ -1,0 +1,61 @@
+<app-navbar />
+<div class="page">
+  <div class="page-header">
+    <a routerLink="/employee/dashboard" class="back"><i class="bi bi-arrow-left"></i> Back</a>
+    <div class="ph-row">
+      <div>
+        <h1 class="pt"><i class="bi bi-bookmark-fill"></i> Saved Drafts</h1>
+        <p class="ps">Pick up where you left off</p>
+      </div>
+      @if (drafts().length > 0) {
+        <span class="count-badge">{{ drafts().length }} draft{{ drafts().length > 1 ? 's' : '' }}</span>
+      }
+    </div>
+  </div>
+
+  @if (drafts().length === 0) {
+    <div class="empty-state">
+      <i class="bi bi-bookmark"></i>
+      <p>No saved drafts yet.</p>
+      <a routerLink="/employee/create-ticket" class="btn-new">
+        <i class="bi bi-plus-circle"></i> Create a Ticket
+      </a>
+    </div>
+  } @else {
+    <div class="drafts-list">
+      @for (d of drafts(); track d.id) {
+        <div class="draft-card">
+          <div class="draft-icon"><i class="bi bi-file-earmark-text"></i></div>
+
+          <div class="draft-body">
+            <span class="draft-title">{{ d.title }}</span>
+            @if (d.description) {
+              <span class="draft-desc">{{ d.description | slice:0:120 }}{{ d.description.length > 120 ? '…' : '' }}</span>
+            }
+            <div class="draft-tags">
+              <span class="tag"><i class="bi bi-clock"></i> {{ d.savedAt | date:'MMM d, y · h:mm a' }}</span>
+              @if (d.priorityId) { <span class="tag"><i class="bi bi-flag"></i> Priority set</span> }
+              @if (d.departmentId) { <span class="tag"><i class="bi bi-building"></i> Dept set</span> }
+              @if (d.dueAt) { <span class="tag"><i class="bi bi-calendar-event"></i> Due {{ d.dueAt | date:'MMM d' }}</span> }
+              @if (d.files && d.files.length > 0) {
+                <span class="tag"><i class="bi bi-paperclip"></i>
+                  @for (f of d.files; track f.name) { {{ f.name }}{{ !$last ? ', ' : '' }} }
+                  ({{ d.files.length }} file{{ d.files.length > 1 ? 's' : '' }})
+                </span>
+              }
+            </div>
+          </div>
+
+          <div class="draft-actions">
+            <button class="btn-continue" (click)="continue(d)">
+              <i class="bi bi-pencil-fill"></i> Continue
+            </button>
+            <button class="btn-discard" (click)="discard(d)">
+              <i class="bi bi-trash3"></i> Discard
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

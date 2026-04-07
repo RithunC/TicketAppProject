@@ -142,7 +142,7 @@ dd   { color: var(--primary-md); font-size: 13px; margin: 0; display: flex; alig
 .chat-empty i { font-size: 28px; }
 
 .chat-msg { display: flex; align-items: flex-end; gap: 8px; }
-.chat-msg.mine   { flex-direction: row-reverse; }
+.chat-msg.mine   { flex-direction: row; }
 .chat-msg.theirs { flex-direction: row; }
 
 .chat-av {
@@ -156,11 +156,13 @@ dd   { color: var(--primary-md); font-size: 13px; margin: 0; display: flex; alig
 .chat-bubble-wrap { display: flex; flex-direction: column; max-width: 72%; }
 .chat-msg.mine .chat-bubble-wrap { align-items: flex-end; }
 .chat-msg.theirs .chat-bubble-wrap { align-items: flex-start; }
+.chat-msg.mine { justify-content: flex-end; }
 
 .chat-meta-top {
   display: flex; align-items: center; gap: 6px;
   margin-bottom: 4px; flex-wrap: wrap;
 }
+.chat-msg.mine .chat-meta-top { justify-content: flex-end; }
 .chat-sender { font-size: 12px; font-weight: 600; color: var(--primary); }
 .chat-time   { font-size: 11px; color: var(--text-faint); }
 
