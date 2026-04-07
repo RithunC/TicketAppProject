@@ -94,3 +94,68 @@
   .navbar-links a span { display: none; }
   .user-meta-inline { display: none; }
 }
+
+/* ── Drafts dropdown ── */
+.drafts-wrap { position: relative; }
+.drafts-wrap:hover .drafts-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+
+.drafts-btn {
+  display: flex; align-items: center; gap: 7px;
+  color: rgba(255,255,255,.7); background: none; border: none;
+  font-size: 14px; font-weight: 500; font-family: inherit;
+  padding: 6px 14px; border-radius: var(--radius-sm);
+  cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.drafts-btn:hover, .drafts-btn.has-drafts { color: #fff; background: rgba(255,255,255,.12); }
+
+.drafts-badge {
+  min-width: 18px; height: 18px; padding: 0 5px;
+  background: #f59e0b; color: #fff;
+  border-radius: 99px; font-size: 10px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+
+.drafts-dropdown {
+  position: absolute; top: calc(100% + 8px); left: 0;
+  width: 300px; background: var(--white);
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg); z-index: 9999;
+  opacity: 0; visibility: hidden; transform: translateY(-8px);
+  transition: opacity .2s ease, visibility .2s ease, transform .2s ease;
+  overflow: hidden;
+}
+
+.dd-empty {
+  display: flex; align-items: center; gap: 8px;
+  padding: 18px 16px; color: var(--text-faint); font-size: 13px;
+}
+.dd-empty i { font-size: 16px; }
+
+.dd-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 14px; cursor: pointer; transition: background .12s;
+  border-bottom: 1px solid var(--border-lt);
+}
+.dd-item:last-child { border-bottom: none; }
+.dd-item:hover { background: var(--bg); }
+
+.dd-item-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.dd-title { font-size: 13px; font-weight: 600; color: var(--primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dd-meta  { font-size: 11px; color: var(--text-faint); display: flex; align-items: center; gap: 4px; }
+
+.dd-discard {
+  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+  background: none; border: 1px solid var(--border);
+  color: var(--text-faint); cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .12s;
+}
+.dd-discard:hover { background: #fee2e2; border-color: #fca5a5; color: #dc2626; }
+
+.drafts-link { position: relative; }
+.drafts-badge {
+  min-width: 18px; height: 18px; padding: 0 5px;
+  background: #f59e0b; color: #fff;
+  border-radius: 99px; font-size: 10px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+}

@@ -38,6 +38,7 @@ export const routes: Routes = [
       { path: 'dashboard',     loadComponent: () => import('./pages/employee/dashboard/employee-dashboard.component').then(m => m.EmployeeDashboardComponent) },
       { path: 'create-ticket', loadComponent: () => import('./pages/employee/create-ticket/create-ticket.component').then(m => m.CreateTicketComponent) },
       { path: 'my-tickets',    loadComponent: () => import('./pages/employee/my-tickets/my-tickets.component').then(m => m.MyTicketsComponent) },
+      { path: 'drafts',        loadComponent: () => import('./pages/employee/drafts/drafts.component').then(m => m.DraftsComponent) },
       { path: 'tickets/:id',   loadComponent: () => import('./pages/employee/ticket-detail/emp-ticket-detail.component').then(m => m.EmpTicketDetailComponent) },
     ]
   },
