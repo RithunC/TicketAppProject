@@ -25,7 +25,7 @@ namespace TicketWebApp.Services
             => string.Equals(roleName, "Admin", StringComparison.OrdinalIgnoreCase)
                || string.Equals(roleName, "Agent", StringComparison.OrdinalIgnoreCase);
 
-        public async Task<CommentResponseDto> AddAsync(long postedByUserId, CommentCreateDto dto)
+        public async Task<CommentResponseDto> AddAsync(long postedByUserId, CommentCreateDto dto) //adding comment
         {
             var ticketStatusRow = await _ticketRepo.GetQueryable()
                 .Where(t => t.Id == dto.TicketId)
@@ -63,7 +63,7 @@ namespace TicketWebApp.Services
             };
         }
 
-        public async Task<IReadOnlyList<CommentResponseDto>> GetByTicketAsync(long ticketId)
+        public async Task<IReadOnlyList<CommentResponseDto>> GetByTicketAsync(long ticketId) //fetching comments
         {
             var list = await _commentRepo.GetQueryable()
                 .Include(c => c.PostedBy)
@@ -83,7 +83,7 @@ namespace TicketWebApp.Services
             }).ToList();
         }
 
-        public async Task<CommentResponseDto?> EditAsync(long editorUserId, long commentId, string newBody)
+        public async Task<CommentResponseDto?> EditAsync(long editorUserId, long commentId, string newBody) //editing a comment
         {
             var row = await _commentRepo.GetQueryable()
                 .Include(c => c.PostedBy)
@@ -129,7 +129,7 @@ namespace TicketWebApp.Services
             };
         }
 
-        public async Task<bool> DeleteAsync(long deleterUserId, long commentId)
+        public async Task<bool> DeleteAsync(long deleterUserId, long commentId) //deleting a comment
         {
             var row = await _commentRepo.GetQueryable()
                 .Include(c => c.Ticket)!.ThenInclude(t => t!.Status)

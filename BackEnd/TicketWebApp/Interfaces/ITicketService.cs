@@ -15,6 +15,8 @@ namespace TicketWebApp.Interfaces
         Task<bool> UpdateStatusAsync(long id, long changedByUserId, TicketStatusUpdateDto dto);
         Task<TicketAssignmentResponseDto?> AssignAsync(long id, long assignedByUserId, TicketAssignRequestDto dto);
         Task<IReadOnlyList<TicketStatusHistoryDto>> GetStatusHistoryAsync(long ticketId);
+        Task<TicketResponseDto?> RequestFeedbackAsync(long ticketId, int pendingStatusId);
+        Task<TicketResponseDto?> RespondFeedbackAsync(long ticketId, long employeeUserId, bool approved);
 
     }
 }

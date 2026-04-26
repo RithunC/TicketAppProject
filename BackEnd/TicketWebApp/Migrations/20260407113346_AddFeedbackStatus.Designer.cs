@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TicketWebApp.Contexts;
 
@@ -11,9 +12,11 @@ using TicketWebApp.Contexts;
 namespace TicketWebApp.Migrations
 {
     [DbContext(typeof(ComplaintContext))]
-    partial class ComplaintContextModelSnapshot : ModelSnapshot
+    [Migration("20260407113346_AddFeedbackStatus")]
+    partial class AddFeedbackStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

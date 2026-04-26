@@ -43,16 +43,19 @@ export interface TicketListItemDto {
   id: number; title: string; priority: string; priorityRank: number;
   status: string; isClosedState: boolean; department?: string; category?: string;
   createdBy: string; assignee?: string; createdAt: string; dueAt?: string;
+  feedbackStatus: string;
 }
 export interface TicketResponseDto {
   id: number; title: string; description?: string;
   departmentId?: number; departmentName?: string;
   categoryId?: number; categoryName?: string;
   priorityId: number; priorityName: string; priorityRank: number;
-  statusId: number; statusName: string;
+  statusId: number; statusName: string; isClosedState: boolean;
   createdByUserId: number; createdByUserName: string;
   currentAssigneeUserId?: number; currentAssigneeUserName?: string;
   createdAt: string; updatedAt?: string; dueAt?: string;
+  feedbackStatus: string;
+  pendingCloseStatusId?: number;
 }
 export interface PagedResult<T> { items: T[]; totalCount: number; page: number; pageSize: number; }
 export interface TicketStatusUpdateDto    { newStatusId: number; note?: string; }
@@ -86,9 +89,17 @@ export interface AttachmentResponseDto {
 
 // ── REPORTS ─────────────────────────────────────────────
 export interface TicketSummaryDto {
-  total: number; open: number; inProgress: number; resolved: number; closed: number;
+  total: number; open: number; inProgress: number; onHold: number;
+  resolved: number; closed: number; active: number;
   highPriority: number; urgentPriority: number; mediumPriority: number; lowPriority: number;
   assignedToMe: number; overdue: number;
+}
+
+export interface AgentWorkloadDto {
+  agentId: number; agentName: string; departmentName?: string;
+  totalAssigned: number; activeOpen: number;
+  open: number; inProgress: number; onHold: number;
+  resolved: number; closed: number;
 }
 
 // ── AUDIT LOGS ──────────────────────────────────────────

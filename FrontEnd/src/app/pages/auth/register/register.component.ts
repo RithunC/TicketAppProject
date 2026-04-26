@@ -61,6 +61,8 @@ export class RegisterComponent implements OnInit {
     // Client-side validation
     if (!this.form.userName.trim()) { this.toast.error('Username is required.'); return; }
     if (!this.form.email.trim())    { this.toast.error('Email is required.'); return; }
+    const emailPattern = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+    if (!emailPattern.test(this.form.email.trim())) { this.toast.error('Please enter a valid email address.'); return; }
     if (!this.form.displayName.trim()) { this.toast.error('Display name is required.'); return; }
     if (this.form.password.length < 6) { this.toast.error('Password must be at least 6 characters.'); return; }
     if (!this.form.roleName)        { this.toast.error('Please select a role.'); return; }

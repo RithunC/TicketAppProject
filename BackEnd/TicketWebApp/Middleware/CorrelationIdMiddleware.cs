@@ -19,7 +19,7 @@
                 : incoming;
             //store id
             context.TraceIdentifier = id; //builtin tracking
-            context.Items["CorrelationId"] = id; //shared data inside request
+            context.Items["CorrelationId"] = id; //share data across middleware/services
             //send id back to client
             context.Response.Headers[HeaderName] = id; //client recieves same id
 

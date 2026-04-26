@@ -17,7 +17,7 @@
 .empty-state p { font-size: 15px; margin: 0; }
 .btn-new {
   display: inline-flex; align-items: center; gap: 7px;
-  padding: 10px 22px; background: var(--primary); border-radius: var(--radius);
+  padding: 6px 20px; background: var(--primary); border-radius: var(--radius);
   color: #fff; font-size: 14px; font-weight: 600; text-decoration: none;
   transition: background .15s;
 }

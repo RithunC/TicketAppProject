@@ -5,7 +5,6 @@ using TicketWebApp.Interfaces;
 using TicketWebApp.Models.DTOs;
 using static TicketWebApp.Models.DTOs.TicketAssignmentDtos;
 using static TicketWebApp.Models.DTOs.TicketDtos;
-
 namespace TicketWebApp.Controllers
 {
     [Route("api/tickets")] //baseurl
@@ -225,6 +224,54 @@ namespace TicketWebApp.Controllers
             catch (KeyNotFoundException ex)
             {
                 return NotFound(new { error = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Return structured error codes the frontend can act on
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Server error", detail = ex.Message });
+            }
+        }
+
+        // --------------------------------------------------------------
+        // POST: Request employee feedback before closing (Admin/Agent)
+        // --------------------------------------------------------------
+        [HttpPost("{id:long}/request-feedback")]
+        [Authorize(Roles = "Admin,Agent")]
+        public async Task<IActionResult> RequestFeedback(long id, [FromBody] RequestFeedbackDto dto)
+        {
+            try
+            {
+                var result = await _tickets.RequestFeedbackAsync(id, dto.PendingStatusId);
+                return result == null ? NotFound() : Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Server error", detail = ex.Message });
+            }
+        }
+
+        // --------------------------------------------------------------
+        // POST: Employee responds to feedback request
+        // --------------------------------------------------------------
+        [HttpPost("{id:long}/feedback-response")]
+        [Authorize(Roles = "Employee")]
+        public async Task<IActionResult> RespondFeedback(long id, [FromBody] FeedbackResponseDto dto)
+        {
+            try
+            {
+                var currentUserId = CurrentUserId();
+                if (currentUserId is null) return Unauthorized();
+
+                var result = await _tickets.RespondFeedbackAsync(id, currentUserId.Value, dto.Approved);
+                return result == null ? NotFound() : Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid();
             }
             catch (InvalidOperationException ex)
             {

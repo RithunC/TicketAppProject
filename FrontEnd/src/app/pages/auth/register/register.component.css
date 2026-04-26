@@ -68,3 +68,8 @@
 .switch a:hover { text-decoration: underline; }
 
 @media(max-width:900px) { .auth-left { display: none; } .auth-right { width: 100%; } .row2 { grid-template-columns: 1fr; } }
+
+.field-err {
+  display: flex; align-items: center; gap: .3rem;
+  color: #dc2626; font-size: .78rem; margin-top: .3rem;
+}

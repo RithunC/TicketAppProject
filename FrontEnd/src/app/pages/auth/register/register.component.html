@@ -47,8 +47,16 @@
           <div class="iw">
             <i class="bi bi-envelope ii"></i>
             <input id="email" type="email" name="email" [(ngModel)]="form.email"
-              required placeholder="you@company.com" class="fc" autocomplete="email" />
+              required pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+              #emailField="ngModel"
+              placeholder="you@company.com" class="fc" autocomplete="email" />
           </div>
+          @if (emailField.invalid && emailField.touched) {
+            <span class="field-err"><i class="bi bi-exclamation-circle"></i>
+              @if (emailField.errors?.['required']) { Email is required. }
+              @else { Please enter a valid email address. }
+            </span>
+          }
         </div>
 
         <!-- Password -->
@@ -58,11 +66,18 @@
             <i class="bi bi-lock ii"></i>
             <input id="password" [type]="showPwd() ? 'text' : 'password'"
               name="password" [(ngModel)]="form.password"
-              required minlength="6" placeholder="Min 6 characters" class="fc" />
+              required minlength="6" placeholder="Min 6 characters" class="fc"
+              #pwdField="ngModel" />
             <button type="button" class="eye-btn" (click)="togglePwd()">
               <i class="bi" [class.bi-eye]="!showPwd()" [class.bi-eye-slash]="showPwd()"></i>
             </button>
           </div>
+          @if (pwdField.invalid && pwdField.touched) {
+            <span class="field-err"><i class="bi bi-exclamation-circle"></i>
+              @if (pwdField.errors?.['required']) { Password is required. }
+              @else { Password must be at least 6 characters. }
+            </span>
+          }
         </div>
 
         <!-- Row 2: Role + Department -->

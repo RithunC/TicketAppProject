@@ -90,9 +90,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 app.UseCors();
+
+
+app.UseMiddleware<TicketWebApp.Middleware.ExceptionMiddleware>();
 app.UseMiddleware<TicketWebApp.Middleware.CorrelationIdMiddleware>();
 app.UseMiddleware<TicketWebApp.Middleware.AuditMiddleware>();
-app.UseMiddleware<TicketWebApp.Middleware.ExceptionMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();

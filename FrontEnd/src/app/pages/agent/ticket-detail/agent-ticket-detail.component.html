@@ -29,16 +29,35 @@
         <div class="card">
           <div class="ch"><h3><i class="bi bi-arrow-clockwise"></i> Update Status</h3></div>
           <div class="cb">
-            <div class="irow">
-              <select [(ngModel)]="newStatusId" class="fsel">
-                <option [ngValue]="0">Select new status…</option>
-                @for (s of statuses(); track s.id) { <option [ngValue]="s.id">{{ s.name }}</option> }
-              </select>
-              <input type="text" [(ngModel)]="statusNote" placeholder="Optional note…" class="finp" />
-              <button class="btn-pri" (click)="updateStatus()" [disabled]="!newStatusId">
-                <i class="bi bi-check-circle"></i> Update
-              </button>
-            </div>
+            @if (isClosed) {
+              <div class="feedback-banner feedback-declined">
+                <i class="bi bi-lock-fill"></i>
+                <span>This ticket is closed. Status cannot be changed.</span>
+              </div>
+            } @else {
+              @if (feedbackPending) {
+                <div class="feedback-banner feedback-pending">
+                  <i class="bi bi-hourglass-split"></i>
+                  <span>Waiting for employee feedback before this ticket can be closed. The employee has been notified.</span>
+                </div>
+              }
+              @if (feedbackDeclined) {
+                <div class="feedback-banner feedback-declined">
+                  <i class="bi bi-x-circle-fill"></i>
+                  <span>Employee indicated the issue is <strong>not resolved</strong>. Ticket cannot be closed.</span>
+                </div>
+              }
+              <div class="irow">
+                <select [(ngModel)]="newStatusId" class="fsel">
+                  <option [ngValue]="0">Select new status…</option>
+                  @for (s of availableStatuses; track s.id) { <option [ngValue]="s.id">{{ s.name }}</option> }
+                </select>
+                <input type="text" [(ngModel)]="statusNote" placeholder="Optional note…" class="finp" />
+                <button class="btn-pri" (click)="updateStatus()" [disabled]="!newStatusId || feedbackPending">
+                  <i class="bi bi-check-circle"></i> Update
+                </button>
+              </div>
+            }
           </div>
         </div>
 

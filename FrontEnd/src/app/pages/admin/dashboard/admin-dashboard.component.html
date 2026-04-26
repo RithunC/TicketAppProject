@@ -59,6 +59,65 @@
         </div>
       </div>
     </div>
+
+    <!-- Agent Workload -->
+    @if (workload().length > 0) {
+      <div class="card wl-card">
+        <div class="ch">
+          <h3><i class="bi bi-people"></i> Agent Workload</h3>
+          <span class="ch-sub">Tickets assigned to each agent</span>
+        </div>
+        <div class="cb">
+          <div class="wl-wrap">
+            <table class="wl-tbl">
+              <thead>
+                <tr>
+                  <th>Agent</th>
+                  <th>Department</th>
+                  <th class="tc">Total</th>
+                  <th class="tc wl-th-active">Active Open</th>
+                  <th class="tc">Open</th>
+                  <th class="tc">In Progress</th>
+                  <th class="tc">On Hold</th>
+                  <th class="tc">Resolved</th>
+                  <th class="tc">Closed</th>
+                  <th class="tc">Load</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (a of workload(); track a.agentId) {
+                  <tr>
+                    <td>
+                      <div class="wl-agent">
+                        <div class="wl-av">{{ a.agentName[0].toUpperCase() }}</div>
+                        <span>{{ a.agentName }}</span>
+                      </div>
+                    </td>
+                    <td class="wl-dept">{{ a.departmentName ?? '—' }}</td>
+                    <td class="tc"><span class="wl-total">{{ a.totalAssigned }}</span></td>
+                    <td class="tc">
+                      <span class="wl-active-open" [class.wl-active-high]="a.activeOpen >= 5">
+                        {{ a.activeOpen }}
+                      </span>
+                    </td>
+                    <td class="tc"><span class="wl-num">{{ a.open }}</span></td>
+                    <td class="tc"><span class="wl-num">{{ a.inProgress }}</span></td>
+                    <td class="tc"><span class="wl-num">{{ a.onHold }}</span></td>
+                    <td class="tc"><span class="wl-resolved">{{ a.resolved }}</span></td>
+                    <td class="tc"><span class="wl-closed">{{ a.closed }}</span></td>
+                    <td class="tc">
+                      <div class="wl-bar-wrap">
+                        <div class="wl-bar" [style.width.%]="pct(a.totalAssigned, workload()[0].totalAssigned || 1)"></div>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    }
   } @else {
     <div class="loading-state"><div class="loading-ring"></div></div>
   }

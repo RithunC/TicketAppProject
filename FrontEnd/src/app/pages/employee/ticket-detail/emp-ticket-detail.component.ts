@@ -46,10 +46,8 @@ export class EmpTicketDetailComponent implements OnInit {
 
   get tid(): number { return +this.route.snapshot.paramMap.get('id')!; }
   get myId(): number { return this.auth.currentUser()?.id ?? 0; }
-  get isClosed(): boolean {
-    const s = this.ticket()?.statusName?.toLowerCase() ?? '';
-    return s === 'closed' || s === 'resolved';
-  }
+  get isClosed(): boolean { return this.ticket()?.isClosedState ?? false; }
+  get feedbackPending(): boolean { return this.ticket()?.feedbackStatus === 'Pending'; }
 
   ngOnInit(): void {
     this.newComment = localStorage.getItem(this.draftKey) ?? '';
@@ -66,6 +64,21 @@ export class EmpTicketDetailComponent implements OnInit {
     this.ts.getHistory(this.tid).subscribe({
       next: h => this.history.set(h),
       error: () => this.history.set([])
+    });
+  }
+
+  respondFeedback(approved: boolean): void {
+    this.ts.respondFeedback(this.tid, approved).subscribe({
+      next: t => {
+        this.ticket.set(t);
+        if (approved) {
+          this.toast.success('Thank you! Your ticket has been marked as resolved.');
+        } else {
+          this.toast.info('Response recorded. The support team will continue working on your issue.');
+        }
+        this.loadAll();
+      },
+      error: () => this.toast.error('Failed to submit response.')
     });
   }
 
@@ -156,5 +169,5 @@ export class EmpTicketDetailComponent implements OnInit {
   }
 
   prioBg(p: string): string    { return ({ High: '#dc2626', Urgent: '#7c3aed', Medium: '#d97706', Low: '#059669' } as Record<string,string>)[p] ?? '#475569'; }
-  isOverdue(d: string): boolean { return new Date(d) < new Date(); }
+  isOverdue(d: string): boolean { return !this.ticket()?.isClosedState && new Date(d) < new Date(); }
 }

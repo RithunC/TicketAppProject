@@ -82,3 +82,37 @@
 .sc-arr { position: absolute; top: 50%; right: 14px; transform: translateY(-50%); font-size: 13px; color: var(--primary-lt); opacity: 0; transition: opacity .15s; }
 .dot-u { background: #7c3aed; }
 .bu    { background: #7c3aed; }
+
+/* ── Agent Workload Table ────────────────────────────────────────── */
+.wl-card { margin-top: 1.25rem; }
+.ch-sub { font-size: .8rem; color: var(--text-muted, #6b7280); margin-left: auto; }
+.wl-wrap { overflow-x: auto; }
+.wl-tbl { width: 100%; border-collapse: collapse; font-size: .875rem; }
+.wl-tbl thead tr { border-bottom: 2px solid var(--border, #e5e7eb); }
+.wl-tbl th { padding: .6rem .75rem; text-align: left; font-weight: 600; color: var(--text-muted, #6b7280); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+.wl-tbl td { padding: .65rem .75rem; border-bottom: 1px solid var(--border, #f3f4f6); }
+.wl-tbl tbody tr:hover { background: var(--hover-bg, #f9fafb); }
+.tc { text-align: center !important; }
+.wl-agent { display: flex; align-items: center; gap: .6rem; }
+.wl-av { width: 30px; height: 30px; border-radius: 50%; background: #6366f1; color: #fff; display: flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 700; flex-shrink: 0; }
+.wl-dept { color: var(--text-muted, #6b7280); font-size: .82rem; }
+.wl-total { font-weight: 700; font-size: .95rem; color: var(--text, #111); }
+.wl-num { color: var(--text-muted, #6b7280); }
+.wl-overdue { background: #fee2e2; color: #b91c1c; padding: .15rem .5rem; border-radius: 999px; font-size: .78rem; font-weight: 600; }
+.wl-bar-wrap { width: 80px; height: 8px; background: var(--border, #e5e7eb); border-radius: 4px; overflow: hidden; }
+.wl-bar { height: 100%; background: #6366f1; border-radius: 4px; transition: width .3s; min-width: 4px; }
+
+.wl-resolved { color: #16a34a; font-weight: 500; }
+.wl-closed   { color: #6b7280; font-weight: 500; }
+
+/* ── Active Open column ─────────────────────────────────────────── */
+.wl-th-active { color: #6366f1; }
+.wl-active-open {
+  display: inline-block; min-width: 28px;
+  padding: .15rem .5rem; border-radius: 999px;
+  background: #ede9fe; color: #4f46e5;
+  font-weight: 700; font-size: .82rem;
+}
+.wl-active-open.wl-active-high {
+  background: #fee2e2; color: #b91c1c;
+}

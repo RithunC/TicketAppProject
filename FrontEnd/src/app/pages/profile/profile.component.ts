@@ -44,21 +44,13 @@ export class ProfileComponent implements OnInit {
   loadProfile(): void {
     this.userSvc.getMe().subscribe({
       next: u => {
-        // Email: from backend response → JWT claim → registration storage → fallback
-        const emailSources = [
-          u.email,
-          this.auth.currentUser()?.email,
-          localStorage.getItem('registered_email') ?? undefined
-        ];
-        const email = emailSources.find(e => !!e);
-
-        // Phone: from backend response → localStorage
+        // Email now comes directly from the backend — no localStorage fallback needed
         const phone = u.phone ?? localStorage.getItem(this.PHONE_KEY) ?? undefined;
-
-        const merged: UserLiteDto = { ...u, email, phone };
+        const merged: UserLiteDto = { ...u, phone };
         this.profile.set(merged);
+        // Keep auth signal in sync with latest display name and email
         this.auth.currentUser.update(cur =>
-          cur ? { ...cur, displayName: u.displayName, email: merged.email } : cur
+          cur ? { ...cur, displayName: u.displayName, email: u.email } : cur
         );
       },
       error: () => this.toast.error('Failed to load profile.')
@@ -94,8 +86,7 @@ export class ProfileComponent implements OnInit {
 
         const merged: UserLiteDto = {
           ...updated,
-          phone: phoneVal || undefined,
-          email: this.profile()?.email // preserve email
+          phone: phoneVal || undefined
         };
         this.profile.set(merged);
         this.auth.currentUser.update(cur =>

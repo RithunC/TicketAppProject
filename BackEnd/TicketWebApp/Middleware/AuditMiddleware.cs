@@ -18,7 +18,7 @@ namespace TicketWebApp.Middleware
         {
             var start = DateTime.UtcNow; //calculates how long req took
 
-            await _next(context);
+            await _next(context); //let request execute
 
             var controller = context.Request.RouteValues["controller"]?.ToString() ?? "";
             var action = context.Request.RouteValues["action"]?.ToString() ?? "";

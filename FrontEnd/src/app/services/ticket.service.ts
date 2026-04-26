@@ -47,6 +47,14 @@ export class TicketService {
     return this.http.get<TicketStatusHistoryDto[]>(`${this.base}/${id}/history`);
   }
 
+  requestFeedback(id: number, pendingStatusId: number): Observable<TicketResponseDto> {
+    return this.http.post<TicketResponseDto>(`${this.base}/${id}/request-feedback`, { pendingStatusId });
+  }
+
+  respondFeedback(id: number, approved: boolean): Observable<TicketResponseDto> {
+    return this.http.post<TicketResponseDto>(`${this.base}/${id}/feedback-response`, { approved });
+  }
+
   /** GET /tickets/employee/{employeeId} — All tickets created by an employee (Admin/Agent only) */
   getByEmployee(employeeId: number): Observable<PagedResult<TicketListItemDto>> {
     return this.http.get<PagedResult<TicketListItemDto>>(`${this.base}/employee/${employeeId}`);

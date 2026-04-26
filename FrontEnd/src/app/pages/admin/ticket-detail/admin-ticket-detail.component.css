@@ -250,3 +250,39 @@ dd   { color: var(--primary-md); font-size: 13px; margin: 0; display: flex; alig
 }
 .chat-submit:hover:not(:disabled) { background: var(--primary-md); }
 .chat-submit:disabled { opacity: .45; cursor: not-allowed; }
+
+/* ── Feedback Modal ─────────────────────────────────────────────── */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,.45);
+  display: flex; align-items: center; justify-content: center; z-index: 1000;
+}
+.modal-box {
+  background: var(--card-bg, #fff); border-radius: 12px; padding: 2rem;
+  max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  text-align: center;
+}
+.modal-icon { font-size: 2.5rem; color: #f59e0b; margin-bottom: .75rem; }
+.modal-title { font-size: 1.15rem; font-weight: 700; margin: 0 0 .75rem; }
+.modal-body { font-size: .9rem; color: var(--text-muted, #555); margin: 0 0 1.5rem; line-height: 1.6; }
+.modal-actions { display: flex; gap: .75rem; justify-content: center; }
+.btn-confirm {
+  padding: .55rem 1.25rem; border-radius: 8px; border: none; cursor: pointer;
+  background: #16a34a; color: #fff; font-weight: 600; font-size: .875rem;
+  display: flex; align-items: center; gap: .4rem;
+}
+.btn-confirm:hover { background: #15803d; }
+
+/* ── Feedback Status Banners ────────────────────────────────────── */
+.feedback-banner {
+  display: flex; align-items: flex-start; gap: .6rem;
+  padding: .75rem 1rem; border-radius: 8px; margin-bottom: .75rem;
+  font-size: .875rem; line-height: 1.5;
+}
+.feedback-pending {
+  background: #fef3c7; border: 1px solid #f59e0b; color: #92400e;
+}
+.feedback-pending i { color: #f59e0b; font-size: 1.1rem; flex-shrink: 0; margin-top: .1rem; }
+.feedback-declined {
+  background: #fee2e2; border: 1px solid #ef4444; color: #991b1b;
+}
+.feedback-declined i { color: #ef4444; font-size: 1.1rem; flex-shrink: 0; margin-top: .1rem; }

@@ -110,7 +110,7 @@
 
 .drafts-badge {
   min-width: 18px; height: 18px; padding: 0 5px;
-  background: #f59e0b; color: #fff;
+  background: #f5af0b; color: #fff;
   border-radius: 99px; font-size: 10px; font-weight: 700;
   display: inline-flex; align-items: center; justify-content: center;
 }
@@ -155,7 +155,7 @@
 .drafts-link { position: relative; }
 .drafts-badge {
   min-width: 18px; height: 18px; padding: 0 5px;
-  background: #f59e0b; color: #fff;
+  background: #596b8c; color: #fff;
   border-radius: 99px; font-size: 10px; font-weight: 700;
   display: inline-flex; align-items: center; justify-content: center;
 }

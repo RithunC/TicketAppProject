@@ -37,6 +37,12 @@
           <span class="sl">Overdue</span>
         </a>
       }
+      @if (pendingFeedback() > 0) {
+        <a routerLink="/employee/my-tickets" class="sp sp-feedback sp-link">
+          <span class="sv">{{ pendingFeedback() }}</span>
+          <span class="sl">Response Needed</span>
+        </a>
+      }
     </div>
   }
 

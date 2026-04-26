@@ -47,9 +47,27 @@ export class AgentTicketDetailComponent implements OnInit {
   newStatusId = 0; statusNote = ''; newComment = ''; isInternal = false;
   isDraft = false;
   deletingCommentId = signal<number | null>(null);
+  showFeedbackModal = signal(false);
+  pendingStatusId   = 0;
 
   get tid(): number { return +this.route.snapshot.paramMap.get('id')!; }
   private get draftKey(): string { return `comment_draft_${this.tid}`; }
+
+  private isClosingStatus(id: number): boolean {
+    const s = this.statuses().find(x => x.id === id);
+    return !!s?.isClosedState;
+  }
+
+  get isClosed(): boolean { return this.ticket()?.isClosedState ?? false; }
+  get feedbackStatus(): string { return this.ticket()?.feedbackStatus ?? 'None'; }
+  get feedbackPending(): boolean { return this.feedbackStatus === 'Pending'; }
+  get feedbackDeclined(): boolean { return this.feedbackStatus === 'Declined'; }
+
+  // Exclude current status from dropdown
+  get availableStatuses(): StatusDto[] {
+    const currentId = this.ticket()?.statusId;
+    return this.statuses().filter(s => s.id !== currentId);
+  }
 
   ngOnInit(): void {
     this.ls.getStatuses().subscribe(s => this.statuses.set(s));
@@ -66,8 +84,32 @@ export class AgentTicketDetailComponent implements OnInit {
 
   updateStatus(): void {
     if (!this.newStatusId) return;
+    if (this.isClosingStatus(this.newStatusId)) {
+      // Must request feedback first — send request to employee
+      this.ts.requestFeedback(this.tid, this.newStatusId).subscribe({
+        next: t => {
+          this.ticket.set(t);
+          this.newStatusId = 0;
+          this.toast.success('Feedback request sent to employee. Status will update once they confirm.');
+        }
+      });
+      return;
+    }
+    this.doUpdateStatus();
+  }
+
+  private doUpdateStatus(): void {
     this.ts.updateStatus(this.tid, { newStatusId: this.newStatusId, note: this.statusNote || undefined })
-      .subscribe({ next: () => { this.toast.success('Status updated!'); this.newStatusId = 0; this.statusNote = ''; this.loadAll(); } });
+      .subscribe({
+        next: () => { this.toast.success('Status updated!'); this.newStatusId = 0; this.statusNote = ''; this.loadAll(); },
+        error: (err) => {
+          const code = err.error?.error;
+          if (code === 'FEEDBACK_REQUIRED') this.toast.warning('Employee feedback is required before closing this ticket.');
+          else if (code === 'FEEDBACK_PENDING') this.toast.warning('Waiting for employee response. Cannot update status yet.');
+          else if (code === 'FEEDBACK_DECLINED') this.toast.error('Employee declined resolution. Cannot close this ticket.');
+          else this.toast.error('Failed to update status.');
+        }
+      });
   }
 
   addComment(): void {
@@ -128,5 +170,5 @@ export class AgentTicketDetailComponent implements OnInit {
   }
 
   prioBg(p: string): string    { return ({ High: '#dc2626', Urgent: '#7c3aed', Medium: '#d97706', Low: '#059669' } as Record<string,string>)[p] ?? '#475569'; }
-  isOverdue(d: string): boolean { return new Date(d) < new Date(); }
+  isOverdue(d: string): boolean { return !this.ticket()?.isClosedState && new Date(d) < new Date(); }
 }

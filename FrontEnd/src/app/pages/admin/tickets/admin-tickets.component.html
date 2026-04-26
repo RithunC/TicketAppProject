@@ -40,6 +40,15 @@
         </select>
       </div>
     </div>
+    @if (hasActiveFilters) {
+      <div class="filter-active-bar">
+        <i class="bi bi-funnel-fill"></i>
+        <span>Filters active</span>
+        <button class="btn-clear-filter" (click)="clearFilters()">
+          <i class="bi bi-x-circle"></i> Clear all
+        </button>
+      </div>
+    }
   </div>
 
   <!-- Table -->
@@ -65,7 +74,7 @@
                 <td>{{ t.createdBy }}</td>
                 <td>{{ t.assignee ?? '—' }}</td>
                 <td>{{ t.createdAt | date:'MMM d, y' }}</td>
-                <td>@if (t.dueAt) { <span [class.ov]="isOverdue(t.dueAt)">{{ t.dueAt | date:'MMM d' }}</span> } @else { — }</td>
+                <td>@if (t.dueAt) { <span [class.ov]="isOverdue(t.dueAt, t.isClosedState)">{{ t.dueAt | date:'MMM d' }}</span> } @else { — }</td>
                 <td><a [routerLink]="['/admin/tickets', t.id]" class="vbtn"><i class="bi bi-eye"></i></a></td>
               </tr>
             }
@@ -100,7 +109,7 @@
         <i class="bi bi-inbox"></i>
         <p>No tickets found</p>
         @if (filters.statusId || filters.priorityId || filters.departmentId) {
-          <button class="btn-clear-filter" (click)="filters.statusId=undefined; filters.priorityId=undefined; filters.departmentId=undefined; applyFilter()">
+          <button class="btn-clear-filter" (click)="clearFilters()">
             <i class="bi bi-x-circle"></i> Clear filters
           </button>
         }

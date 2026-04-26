@@ -67,7 +67,7 @@ export class AgentTicketsComponent implements OnInit {
     return pages;
   }
 
-  isOverdue(d: string): boolean { return new Date(d) < new Date(); }
+  isOverdue(d: string, isClosedState = false): boolean { return !isClosedState && new Date(d) < new Date(); }
   prioBg(p: string): string     { return ({ High: '#dc2626', Urgent: '#7c3aed', Medium: '#d97706', Low: '#059669' } as Record<string,string>)[p] ?? '#475569'; }
   min(a: number, b: number): number { return Math.min(a, b); }
 }

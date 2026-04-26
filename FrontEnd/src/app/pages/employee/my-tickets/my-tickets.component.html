@@ -40,8 +40,14 @@
               <span class="badge-priority" [style.background]="prioBg(t.priority)">
                 {{ t.priority }}
               </span>
-              @if (t.dueAt && isOverdue(t.dueAt)) {
+              @if (t.dueAt && isOverdue(t.dueAt, t.isClosedState)) {
                 <span class="ov-badge"><i class="bi bi-alarm"></i> Overdue</span>
+              }
+              @if (t.feedbackStatus === 'Pending') {
+                <span class="fb-badge"><i class="bi bi-question-circle-fill"></i> Response Needed</span>
+              }
+              @if (t.feedbackStatus === 'Declined') {
+                <span class="fb-badge-declined"><i class="bi bi-x-circle-fill"></i> Issue Not Resolved</span>
               }
             </div>
             <h3 class="tttl">{{ t.title }}</h3>

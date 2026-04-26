@@ -40,7 +40,7 @@ namespace TicketWebApp.Controllers
         /// </summary>
         [HttpPost]
         public async Task<IActionResult> Add(
-            [FromBody] CommentCreateDto dto,
+            [FromBody] CommentCreateDto dto, //reads request body and binds to commentcreate dto
             [FromHeader(Name = "X-User-Id")] long? xUserId = null)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);

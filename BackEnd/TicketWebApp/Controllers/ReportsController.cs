@@ -52,7 +52,6 @@ namespace TicketWebApp.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                // Example: "No statuses configured"
                 return BadRequest(new { error = ex.Message });
             }
             catch (ArgumentException ex)
@@ -61,11 +60,23 @@ namespace TicketWebApp.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    error = "Server error",
-                    detail = ex.Message
-                });
+                return StatusCode(500, new { error = "Server error", detail = ex.Message });
+            }
+        }
+
+        // GET api/reports/agents/workload — Admin only
+        [HttpGet("agents/workload")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAgentWorkload()
+        {
+            try
+            {
+                var workload = await _reports.GetAgentWorkloadAsync();
+                return Ok(workload);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Server error", detail = ex.Message });
             }
         }
     }

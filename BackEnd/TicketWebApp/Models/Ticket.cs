@@ -32,6 +32,10 @@ namespace TicketWebApp.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
 
+        // Feedback workflow: agent requests feedback before closing/resolving
+        public string FeedbackStatus { get; set; } = "None"; // None | Pending | Approved | Declined
+        public int? PendingCloseStatusId { get; set; } // the status id waiting for approval
+
         // Navigation
         public Collection<TicketAssignment>? Assignments { get; set; }
         public Collection<TicketStatusHistory>? StatusHistory { get; set; }

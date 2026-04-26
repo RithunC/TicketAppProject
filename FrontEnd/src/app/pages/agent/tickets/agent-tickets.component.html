@@ -19,7 +19,7 @@
             <span class="tid">#{{ t.id }}</span>
             <span class="badge-status status-{{ t.status | lowercase | replace:' ':'-' }}">{{ t.status }}</span>
             <span class="badge-priority" [style.background]="prioBg(t.priority)">{{ t.priority }}</span>
-            @if (t.dueAt && isOverdue(t.dueAt)) {
+            @if (t.dueAt && isOverdue(t.dueAt, t.isClosedState)) {
               <span class="ov-badge"><i class="bi bi-alarm"></i> Overdue</span>
             }
           </div>

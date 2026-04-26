@@ -168,7 +168,7 @@ dd { color: var(--primary-md); font-size: 13px; margin: 0; display: flex; align-
 
 .chat-bubble {
   position: relative;
-  padding: 10px 14px;
+  padding: 8px 14px;
   border-radius: 16px;
   font-size: 14px; line-height: 1.55;
   word-break: break-word;
@@ -244,3 +244,24 @@ dd { color: var(--primary-md); font-size: 13px; margin: 0; display: flex; align-
 }
 .chat-submit:hover:not(:disabled) { background: var(--primary-md); }
 .chat-submit:disabled { opacity: .45; cursor: not-allowed; }
+
+/* ── Feedback Request Card ──────────────────────────────────────── */
+.feedback-request-card {
+  display: flex; gap: 1rem; align-items: flex-start;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border: 1.5px solid #3b82f6; border-radius: 12px;
+  padding: 1.25rem 1.5rem; margin-bottom: 1.25rem;
+}
+.fr-icon { font-size: 2rem; color: #2563eb; flex-shrink: 0; margin-top: .1rem; }
+.fr-content h4 { margin: 0 0 .4rem; font-size: 1rem; font-weight: 700; color: #1e40af; }
+.fr-content p  { margin: 0 0 1rem; font-size: .875rem; color: #1e3a8a; line-height: 1.5; }
+.fr-actions { display: flex; gap: .75rem; flex-wrap: wrap; }
+.fr-yes, .fr-no {
+  padding: .5rem 1.25rem; border-radius: 8px; border: none;
+  cursor: pointer; font-weight: 600; font-size: .875rem;
+  display: flex; align-items: center; gap: .4rem;
+}
+.fr-yes { background: #16a34a; color: #fff; }
+.fr-yes:hover { background: #15803d; }
+.fr-no  { background: #dc2626; color: #fff; }
+.fr-no:hover  { background: #b91c1c; }

@@ -123,8 +123,9 @@ namespace TicketWebApp.Services
                     CreatedBy = t.CreatedBy!.DisplayName,
                     Assignee = t.CurrentAssignee != null ? t.CurrentAssignee.DisplayName : null,
                     CreatedAt = t.CreatedAt,
-                    DueAt = t.DueAt //query building
-                }).ToListAsync(); //actual execution
+                    DueAt = t.DueAt,
+                    FeedbackStatus = t.FeedbackStatus
+                }).ToListAsync();
 
             return new PagedResult<TicketListItemDto>
             {
@@ -155,14 +156,30 @@ namespace TicketWebApp.Services
 
         public async Task<bool> UpdateStatusAsync(long id, long changedByUserId, TicketStatusUpdateDto dto)
         {
-            var t = await _ticketRepo.Get(id);
+            var t = await _ticketRepo.GetQueryable()
+                .Include(x => x.Status)
+                .FirstOrDefaultAsync(x => x.Id == id);
             if (t == null) return false;
 
             // Ensure the target status exists
-            var newStatusExists = await _statusRepo.GetQueryable()
-                .AnyAsync(s => s.Id == dto.NewStatusId);
-            if (!newStatusExists)
+            var newStatus = await _statusRepo.GetQueryable()
+                .FirstOrDefaultAsync(s => s.Id == dto.NewStatusId);
+            if (newStatus == null)
                 throw new KeyNotFoundException("Status not found.");
+
+            // Block terminal status changes unless employee has approved
+            if (newStatus.IsClosedState)
+            {
+                if (t.FeedbackStatus == "None")
+                    throw new InvalidOperationException("FEEDBACK_REQUIRED");
+                if (t.FeedbackStatus == "Pending")
+                    throw new InvalidOperationException("FEEDBACK_PENDING");
+                if (t.FeedbackStatus == "Declined")
+                    throw new InvalidOperationException("FEEDBACK_DECLINED");
+                // FeedbackStatus == "Approved" — allowed, reset after closing
+                t.FeedbackStatus = "None";
+                t.PendingCloseStatusId = null;
+            }
 
             var old = t.StatusId;
             t.StatusId = dto.NewStatusId;
@@ -180,7 +197,62 @@ namespace TicketWebApp.Services
                 Note = dto.Note
             });
 
-            return true; //update successful
+            return true;
+        }
+
+        public async Task<TicketResponseDto?> RequestFeedbackAsync(long ticketId, int pendingStatusId)
+        {
+            var t = await _ticketRepo.Get(ticketId);
+            if (t == null) return null;
+
+            t.FeedbackStatus = "Pending";
+            t.PendingCloseStatusId = pendingStatusId;
+            t.UpdatedAt = DateTime.UtcNow;
+            await _ticketRepo.Update(ticketId, t);
+
+            return await GetAsync(ticketId);
+        }
+
+        public async Task<TicketResponseDto?> RespondFeedbackAsync(long ticketId, long employeeUserId, bool approved)
+        {
+            var t = await _ticketRepo.GetQueryable()
+                .Include(x => x.Status)
+                .FirstOrDefaultAsync(x => x.Id == ticketId);
+            if (t == null) return null;
+
+            // Only the ticket creator can respond
+            if (t.CreatedByUserId != employeeUserId)
+                throw new UnauthorizedAccessException("Only the ticket creator can respond to feedback.");
+
+            if (t.FeedbackStatus != "Pending")
+                throw new InvalidOperationException("No pending feedback request for this ticket.");
+
+            t.FeedbackStatus = approved ? "Approved" : "Declined";
+            t.UpdatedAt = DateTime.UtcNow;
+            await _ticketRepo.Update(ticketId, t);
+
+            // If approved, automatically apply the pending status change
+            if (approved && t.PendingCloseStatusId.HasValue)
+            {
+                var old = t.StatusId;
+                t.StatusId = t.PendingCloseStatusId.Value;
+                t.FeedbackStatus = "None";
+                t.PendingCloseStatusId = null;
+                t.UpdatedAt = DateTime.UtcNow;
+                await _ticketRepo.Update(ticketId, t);
+
+                await _statusHistoryRepo.Add(new TicketStatusHistory
+                {
+                    TicketId = ticketId,
+                    OldStatusId = old,
+                    NewStatusId = t.StatusId,
+                    ChangedByUserId = employeeUserId,
+                    ChangedAt = DateTime.UtcNow,
+                    Note = "Status updated after employee confirmed resolution."
+                });
+            }
+
+            return await GetAsync(ticketId);
         }
 
         public async Task<TicketAssignmentResponseDto?> AssignAsync(long id, long assignedByUserId, TicketAssignRequestDto dto)
@@ -269,13 +341,16 @@ namespace TicketWebApp.Services
             PriorityRank = t.Priority?.Rank ?? 0,
             StatusId = t.StatusId,
             StatusName = t.Status?.Name ?? "",
+            IsClosedState = t.Status?.IsClosedState ?? false,
             CreatedByUserId = t.CreatedByUserId,
             CreatedByUserName = t.CreatedBy?.UserName ?? "",
             CurrentAssigneeUserId = t.CurrentAssigneeUserId,
             CurrentAssigneeUserName = t.CurrentAssignee?.UserName,
             CreatedAt = t.CreatedAt,
             UpdatedAt = t.UpdatedAt,
-            DueAt = t.DueAt
+            DueAt = t.DueAt,
+            FeedbackStatus = t.FeedbackStatus,
+            PendingCloseStatusId = t.PendingCloseStatusId
         };
 
         public async Task<IReadOnlyList<TicketStatusHistoryDto>> GetStatusHistoryAsync(long ticketId)

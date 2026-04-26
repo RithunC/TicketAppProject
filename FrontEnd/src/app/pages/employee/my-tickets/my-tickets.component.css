@@ -93,3 +93,20 @@
 .pgb-num { min-width:34px; }
 .pgb-active { background:var(--primary); color:#fff; border-color:var(--primary); font-weight:700; }
 .pg-ellipsis { color:var(--text-faint); font-size:13px; padding:0 4px; }
+
+/* ── Feedback badges on ticket list ────────────────────────────── */
+.fb-badge {
+  display: inline-flex; align-items: center; gap: .3rem;
+  padding: .2rem .6rem; border-radius: 999px; font-size: .72rem; font-weight: 600;
+  background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd;
+  animation: pulse-blue 2s infinite;
+}
+.fb-badge-declined {
+  display: inline-flex; align-items: center; gap: .3rem;
+  padding: .2rem .6rem; border-radius: 999px; font-size: .72rem; font-weight: 600;
+  background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5;
+}
+@keyframes pulse-blue {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .65; }
+}

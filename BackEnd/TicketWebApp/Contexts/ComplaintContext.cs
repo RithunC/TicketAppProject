@@ -31,7 +31,7 @@ namespace TicketWebApp.Contexts
                 .HasKey(d => d.Id).HasName("PK_Departments");
 
             modelBuilder.Entity<Department>()
-                .Property(d => d.Name).HasMaxLength(150).IsRequired();
+                .Property(d => d.Name).HasMaxLength(150).IsRequired(); //column configuration define column level constraints
 
             // ===== Role =====
             modelBuilder.Entity<Role>()
@@ -41,7 +41,7 @@ namespace TicketWebApp.Contexts
                 .Property(r => r.Name).HasMaxLength(100).IsRequired();
 
             modelBuilder.Entity<Role>()
-                .HasIndex(r => r.Name).IsUnique().HasDatabaseName("UQ_Role_Name");
+                .HasIndex(r => r.Name).IsUnique().HasDatabaseName("UQ_Role_Name"); //creates index for faster queries
 
             // ===== User =====
             modelBuilder.Entity<User>()
@@ -63,14 +63,14 @@ namespace TicketWebApp.Contexts
                 .HasIndex(u => u.UserName).IsUnique().HasDatabaseName("UQ_User_UserName");
 
             modelBuilder.Entity<User>()
-                .HasIndex(u => u.Email).IsUnique().HasDatabaseName("UQ_User_Email");
+                .HasIndex(u => u.Email).IsUnique().HasDatabaseName("UQ_User_Email");//no two users can have same email
 
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)
                 .WithMany(r => r.Users)
                 .HasForeignKey(u => u.RoleId)
-                .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("FK_User_Role");
+                .OnDelete(DeleteBehavior.Restrict) //prevent delete if child exists
+                .HasConstraintName("FK_User_Role"); //custom name for foreign key
 
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Department)

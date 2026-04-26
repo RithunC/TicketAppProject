@@ -62,6 +62,8 @@
 
             public DateTime CreatedAt { get; set; }
             public DateTime? DueAt { get; set; }
+
+            public string FeedbackStatus { get; set; } = "None";
         }
 
         public class TicketResponseDto
@@ -84,6 +86,7 @@
 
             public int StatusId { get; set; }
             public string StatusName { get; set; } = string.Empty;
+            public bool IsClosedState { get; set; }
 
             public long CreatedByUserId { get; set; }
             public string CreatedByUserName { get; set; } = string.Empty;
@@ -94,7 +97,21 @@
             public DateTime CreatedAt { get; set; }
             public DateTime? UpdatedAt { get; set; }
             public DateTime? DueAt { get; set; }
+
+            // Feedback workflow
+            public string FeedbackStatus { get; set; } = "None";
+            public int? PendingCloseStatusId { get; set; }
         }
 
     }
+}
+
+public class RequestFeedbackDto
+{
+    public int PendingStatusId { get; set; }
+}
+
+public class FeedbackResponseDto
+{
+    public bool Approved { get; set; }
 }

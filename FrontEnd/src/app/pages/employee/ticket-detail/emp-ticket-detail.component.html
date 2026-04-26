@@ -18,6 +18,25 @@
     <div class="dgrid">
       <div class="mcol">
 
+        <!-- Feedback Request Banner -->
+        @if (feedbackPending) {
+          <div class="feedback-request-card">
+            <div class="fr-icon"><i class="bi bi-question-circle-fill"></i></div>
+            <div class="fr-content">
+              <h4>Was your issue resolved?</h4>
+              <p>The support team has marked this ticket as resolved. Please confirm whether your issue has been addressed.</p>
+              <div class="fr-actions">
+                <button class="fr-yes" (click)="respondFeedback(true)">
+                  <i class="bi bi-check-circle-fill"></i> Yes, it's resolved
+                </button>
+                <button class="fr-no" (click)="respondFeedback(false)">
+                  <i class="bi bi-x-circle-fill"></i> No, still an issue
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+
         <!-- Description -->
         <div class="card">
           <div class="ch"><h3><i class="bi bi-file-text"></i> Description</h3></div>

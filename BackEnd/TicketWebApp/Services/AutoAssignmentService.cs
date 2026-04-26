@@ -7,7 +7,7 @@ namespace TicketWebApp.Services
 {
     public class AutoAssignmentService : IAutoAssignmentService
     {
-        private readonly ITicketService _ticketService;
+        private readonly ITicketService _ticketService; 
         private readonly IRepository<long, Ticket> _ticketRepo;
         private readonly IRepository<long, User> _userRepo;
 

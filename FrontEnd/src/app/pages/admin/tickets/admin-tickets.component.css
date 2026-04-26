@@ -87,3 +87,13 @@
   cursor: pointer; transition: all .15s; margin-top: 8px;
 }
 .btn-clear-filter:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+/* ── Active filter indicator ────────────────────────────────────── */
+.filter-active-bar {
+  display: flex; align-items: center; gap: .5rem;
+  margin-top: .75rem; padding: .5rem .75rem;
+  background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px;
+  font-size: .8rem; color: #1d4ed8;
+}
+.filter-active-bar i { color: #3b82f6; }
+.filter-active-bar span { flex: 1; }
